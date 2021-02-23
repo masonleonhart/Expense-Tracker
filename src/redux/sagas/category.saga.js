@@ -3,7 +3,7 @@ import { takeEvery, put } from 'redux-saga/effects';
 
 function* fetchCategorySaga() {
     try {
-        let response = yield axios.get('/api/category/list');
+        const response = yield axios.get('/api/category/');
         yield put({ type: 'SET_CATEGORIES', payload: response.data });
     } catch (error) {
         console.log('Error in fetching categories', error);

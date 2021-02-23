@@ -31,7 +31,7 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 //     });
 // });
 
-router.get('/list', rejectUnauthenticated, async (req, res) => {
+router.get('/', rejectUnauthenticated, async (req, res) => {
     const queryText = `SELECT * FROM "category" WHERE "user_id" = ${req.user.id}`;
 
     try {

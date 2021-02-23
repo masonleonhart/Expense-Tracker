@@ -12,6 +12,7 @@ function UserPage() {
 
   useEffect(() => {
     dispatch({ type: 'FETCH_CATEGORIES' });
+    dispatch({ type: 'FETCH_EXPENSES' });
   }, []);
 
   return (

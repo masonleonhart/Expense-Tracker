@@ -5,7 +5,7 @@ function UserPageExpense() {
     const expense = useSelector(store => store.expense);
     const dispatch = useDispatch();
 
-    let [toggleExpenseAddForm, setToggleAddForm] = useState(false);
+    let [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
 
     const handleExpenseSubmit = e => {
         e.preventDefault();
@@ -16,7 +16,7 @@ function UserPageExpense() {
         <>
             {toggleExpenseAddForm &&
                 <>
-                    <form onSubmit={handleExpenseSubmit} onReset={() => setToggleAddForm(false)}>
+                    <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
                         <label htmlFor="name-input">Transaction Name</label>
                         <br />
                         <input type="text" id='name-input' value={expense.newExpenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })} required />
@@ -45,7 +45,7 @@ function UserPageExpense() {
                         <th>Amount</th>
                         <th>Date</th>
                         <th>Category</th>
-                        <th><button onClick={() => !toggleAddForm ? setToggleAddForm(true) : setToggleAddForm(false)}>Add Expense</button></th>
+                        <th><button onClick={() => !toggleExpenseAddForm ? setToggleExpenseAddForm(true) : setToggleExpenseAddForm(false)}>Add Expense</button></th>
                     </tr>
                 </thead>
                 <tbody>

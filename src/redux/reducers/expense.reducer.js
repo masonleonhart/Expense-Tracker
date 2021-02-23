@@ -9,7 +9,7 @@ const expenseReducer = (state = [], action) => {
     };
 };
 
-const newExpenseReducer = (state = { name: '', amount: '', date: '' }, action) => {
+const newExpenseReducer = (state = { category_id: 'Set Category', name: '', amount: '', date: '' }, action) => {
     let newState = { ...state };
 
     switch (action.type) {

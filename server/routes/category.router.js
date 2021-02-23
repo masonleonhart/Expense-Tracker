@@ -31,6 +31,13 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 //     });
 // });
 
+
+// POST
+
+
+
+// GET
+
 router.get('/', rejectUnauthenticated, async (req, res) => {
     const queryText = `SELECT * FROM "category" WHERE "user_id" = ${req.user.id}`;
 
@@ -54,14 +61,6 @@ router.get('/', rejectUnauthenticated, async (req, res) => {
         console.log('Error in getting categories', err);
         res.sendStatus(500);
     };
-});
-
-router.post('/spent', rejectUnauthenticated, (req, res) => {
-    const queryText = `SELECT c.id, c.name, SUM(e.amount) FROM "category" as c
-                        JOIN "expense" as e on c.id = e.category_id
-                        WHERE c.id = $1 GROUP BY c.id;`;
-
-    console.log(req.body)
 });
 
 module.exports = router;

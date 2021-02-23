@@ -10,8 +10,19 @@ function* fetchExpensesSaga() {
     };
 };
 
+function* addNewExpenseSaga(action) {
+    try {
+        yield axios.post('/api/expense', action.payload);
+        yield put({ type: 'FETCH_EXPENSES' });
+        yield put({ type: 'FETCH_CATEGORIES' });
+    } catch (error) {
+        console.log('Error in adding new expense', error);
+    }
+};
+
 function* expenseSaga() {
     yield takeEvery('FETCH_EXPENSES', fetchExpensesSaga);
+    yield takeEvery('ADD_NEW_EXPENSE', addNewExpenseSaga);
 };
 
 export default expenseSaga;

@@ -102,7 +102,7 @@ function UserPage() {
                   </select> :
                   category.categoryReducer[expense.category_id - 1].name}
               </td>
-              <td><button>Delete Expense</button></td>
+              <td><button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Expense</button></td>
             </tr>)}
           </tbody>
         </table> : <> </>}

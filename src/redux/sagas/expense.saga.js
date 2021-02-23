@@ -23,7 +23,17 @@ function* addNewExpenseSaga(action) {
 
 function* updateExpenseCategorySaga(action) {
     try {
-        yield axios.put(`/api/expense/unassigned/${action.payload.expense_id}`, {category_id: action.payload.category_id});
+        yield axios.put(`/api/expense/unassigned/${action.payload.expense_id}`, { category_id: action.payload.category_id });
+        yield put({ type: 'FETCH_EXPENSES' });
+        yield put({ type: 'FETCH_CATEGORIES' });
+    } catch (error) {
+        console.log('Error in updating expense category', error);
+    };
+};
+
+function* deleteExpenseSaga(action) {
+    try {
+        yield axios.delete(`/api/expense/${action.payload}`);
         yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'FETCH_CATEGORIES' });
     } catch (error) {
@@ -34,7 +44,8 @@ function* updateExpenseCategorySaga(action) {
 function* expenseSaga() {
     yield takeEvery('FETCH_EXPENSES', fetchExpensesSaga);
     yield takeEvery('ADD_NEW_EXPENSE', addNewExpenseSaga);
-    yield takeEvery('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga)
+    yield takeEvery('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
+    yield takeEvery('DELETE_EXPENSE', deleteExpenseSaga);
 };
 
 export default expenseSaga;

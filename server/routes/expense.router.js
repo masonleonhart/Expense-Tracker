@@ -49,4 +49,18 @@ router.put('/unassigned/:id', rejectUnauthenticated, (req, res) => {
     });
 });
 
+// DELETE 
+
+router.delete(`/:id`, rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `DELETE FROM "expense" WHERE "id" = ${req.params.id};`;
+
+    pool.query(sqlQuery).then(() => {
+        console.log('Deleted expense successfully');
+        res.sendStatus(204);
+    }).catch(err => {
+        console.log('Error in deleting expense', err);
+        res.sendStatus(500);
+    });
+});
+
 module.exports = router;

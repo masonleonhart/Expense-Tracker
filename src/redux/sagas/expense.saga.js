@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { takeEvery, put } from 'redux-saga/effects';
+import { takeLatest, put } from 'redux-saga/effects';
 
 function* fetchExpensesSaga() {
     try {
@@ -12,12 +12,23 @@ function* fetchExpensesSaga() {
 
 function* addNewExpenseSaga(action) {
     try {
-        yield axios.post('/api/expense', action.payload);
+        yield axios.post('/api/expense/expense', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
         yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'RESET_NEW_EXPENSE_REDUCER' });
     } catch (error) {
         console.log('Error in adding new expense', error);
+    };
+};
+
+function* addNewIncomeSaga(action) {
+    try {
+        yield axios.post('/api/expense/income', action.payload);
+        yield put({ type: 'FETCH_CATEGORIES' });
+        yield put({ type: 'FETCH_EXPENSES' });
+        yield put({ type: 'RESET_NEW_INCOME_REDUCER' });
+    } catch (error) {
+        console.log('Error in adding new income', error);
     };
 };
 
@@ -42,10 +53,11 @@ function* deleteExpenseSaga(action) {
 };
 
 function* expenseSaga() {
-    yield takeEvery('FETCH_EXPENSES', fetchExpensesSaga);
-    yield takeEvery('ADD_NEW_EXPENSE', addNewExpenseSaga);
-    yield takeEvery('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
-    yield takeEvery('DELETE_EXPENSE', deleteExpenseSaga);
+    yield takeLatest('FETCH_EXPENSES', fetchExpensesSaga);
+    yield takeLatest('ADD_NEW_EXPENSE', addNewExpenseSaga);
+    yield takeLatest('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
+    yield takeLatest('DELETE_EXPENSE', deleteExpenseSaga);
+    yield takeLatest('ADD_NEW_INCOME', addNewIncomeSaga);
 };
 
 export default expenseSaga;

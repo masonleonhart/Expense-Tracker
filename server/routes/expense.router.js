@@ -5,7 +5,7 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 
 // POST
 
-router.post('/', rejectUnauthenticated, (req, res) => {
+router.post('/expense', rejectUnauthenticated, (req, res) => {
     const sqlQuery = `INSERT INTO "expense" ("user_id", "category_id", "name", "amount", "date")
                         VALUES (${req.user.id}, $1, $2, $3, $4);`;
 
@@ -17,7 +17,7 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 
     let category_id = req.body.category_id === 0 ? null : req.body.category_id;
 
-    pool.query(sqlQuery, [category_id, req.body.name, req.body.amount, req.body.date]).then(() => {
+    pool.query(sqlQuery, [Number(category_id), `${req.body.name}`, `${req.body.amount}`, `${req.body.date}`]).then(() => {
         console.log('Added new expense successfully');
         res.sendStatus(201);
     }).catch(err => {
@@ -26,13 +26,35 @@ router.post('/', rejectUnauthenticated, (req, res) => {
     });
 });
 
+router.post('/income', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `INSERT INTO "expense" ("user_id", "income", "name", "amount", "date")
+                        VALUES (${req.user.id}, ${req.body.income}, $1, $2, $3);`;
+
+    if (!req.body.name, !req.body.amount, !req.body.date) {
+        console.log('Try again with valid fields');
+        res.sendStatus(400);
+        return;
+    };
+
+    console.log(req.body);
+
+    pool.query(sqlQuery, [`${req.body.name}`, `${req.body.amount}`, `${req.body.date}`]).then(() => {
+        console.log('Added new income successfully');
+        res.sendStatus(201);
+    }).catch(err => {
+        console.log('Error in adding income', err);
+        res.sendStatus(500);
+    });
+});
+
 // GET
 
 router.get('/', rejectUnauthenticated, (req, res) => {
-    const sqlQuery = `SELECT e.id, e.user_id, e.name, e.amount, e.date, e.transaction_id, c.id as category_id, c.name as category_name
+    const sqlQuery = `SELECT e.id, e.user_id, e.name, e.amount, e.date, e.transaction_id, e.income, 
+                                c.id as category_id, c.name as category_name
                         FROM "expense" as e
                         FULL JOIN "category" as c on e.category_id = c.id
-                        WHERE e.id IS NOT NULL AND e.user_id = ${req.user.id} ORDER BY e.date DESC`;
+                        WHERE e.id IS NOT NULL AND e.user_id = ${req.user.id} ORDER BY e.date DESC;`;
 
     pool.query(sqlQuery).then(response => {
         console.log('Retrieved expenses successfully ');

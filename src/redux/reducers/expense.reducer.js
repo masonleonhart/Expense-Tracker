@@ -29,10 +29,31 @@ const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date:
             return state = { category_id: 0, name: '', amount: '', date: '' };
         default:
             return state;
-    }
+    };
+};
+
+const newIncomeReducer = (state = { income: true, name: '', amount: '', date: '' }, action) => {
+    let newState = { ...state };
+
+    switch (action.type) {
+        case 'SET_NEW_INCOME_NAME':
+            newState.name = action.payload;
+            return newState;
+        case 'SET_NEW_INCOME_AMOUNT':
+            newState.amount = action.payload;
+            return newState;
+        case 'SET_NEW_INCOME_DATE':
+            newState.date = action.payload;
+            return newState;
+        case 'RESET_NEW_INCOME_REDUCER':
+            return state = { category_id: 0, name: '', amount: '', date: '' };
+        default:
+            return state;
+    };
 };
 
 export default combineReducers({
     expenseReducer,
     newExpenseReducer,
+    newIncomeReducer
 });

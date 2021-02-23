@@ -13,16 +13,22 @@ function UserPage() {
   let [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
   let [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
 
+  const handleCategorySubmit = e => {
+    e.preventDefault();
+    dispatch({ type: 'ADD_NEW_CATEGORY', payload: category.newCategoryReducer });
+    setToggleCategoryAddForm(false);
+  };
+
   const handleExpenseSubmit = e => {
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_EXPENSE', payload: expense.newExpenseReducer });
     setToggleExpenseAddForm(false);
   };
 
-  const handleCategorySubmit = e => {
+  const handleIncomeSubmit = e => {
     e.preventDefault();
-    dispatch({ type: 'ADD_NEW_CATEGORY', payload: category.newCategoryReducer });
-    setToggleCategoryAddForm(false);
+    dispatch({ type: 'ADD_NEW_INCOME', payload: expense.newIncomeReducer });
+    setToggleIncomeAddForm(false);
   };
 
   useEffect(() => {
@@ -72,7 +78,7 @@ function UserPage() {
       }
       <h2>Expenses</h2>
       <div id='expense-container'>
-        { category.categoryReducer.length > 0 ?
+        {category.categoryReducer.length > 0 ?
           <table id='expense-table'>
             <thead>
               <tr>
@@ -92,7 +98,7 @@ function UserPage() {
                 <td>${expense.amount}</td>
                 <td>{expense.date}</td>
                 <td>
-                  {expense.category_id === null ?
+                  {expense.category_id === null && expense.income === true ? <></> : expense.category_id === null ?
                     <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
                       <option value="0">Select a Category</option>
                       {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
@@ -107,22 +113,22 @@ function UserPage() {
           <div>
             <h3>Add an Expense</h3>
             <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
-              <label htmlFor="expense-category-select">Transaction Category</label>
+              <label htmlFor="expense-category-select">Expense Category</label>
               <br />
               <select value={expense.newExpenseReducer.category_id} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: e.target.value })} id="expense-category-select" >
                 <option value="0">Select a Category</option>
                 {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
               </select>
               <br />
-              <label htmlFor="expense-name-input">Transaction Name</label>
+              <label htmlFor="expense-name-input">Expense Name</label>
               <br />
               <input type="text" id='expense-name-input' value={expense.newExpenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })} required />
               <br />
-              <label htmlFor="expense-amount-input">Transaction Amount</label>
+              <label htmlFor="expense-amount-input">Expense Amount</label>
               <br />
               <input type="number" id="expense-amount-input" value={expense.newExpenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_AMOUNT', payload: e.target.value })} required />
               <br />
-              <label htmlFor="expense-date-input">Transaction Date</label>
+              <label htmlFor="expense-date-input">Expense Date</label>
               <br />
               <input type="date" id='expense-date-input' value={expense.newExpenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_DATE', payload: e.target.value })} required />
               <br />
@@ -135,18 +141,18 @@ function UserPage() {
         {toggleIncomeAddForm &&
           <div>
             <h3>Add an Income</h3>
-            <form onReset={() => setToggleIncomeAddForm(false)}>
-              <label htmlFor="income-name-input">Transaction Name</label>
+            <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
+              <label htmlFor="income-name-input">Income Name</label>
               <br />
-              <input type="text" id='income-name-input' required />
+              <input type="text" id='income-name-input' value={expense.expenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
               <br />
-              <label htmlFor="income-amount-input">Transaction Amount</label>
+              <label htmlFor="income-amount-input">Income Amount</label>
               <br />
-              <input type="number" id="income-amount-input" required />
+              <input type="number" id="income-amount-input" value={expense.expenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
               <br />
-              <label htmlFor="income-date-input">Transaction Date</label>
+              <label htmlFor="income-date-input">Income Date</label>
               <br />
-              <input type="date" id='income-date-input' required />
+              <input type="date" id='income-date-input' value={expense.expenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
               <br />
               <br />
               <button type='reset'>Cancel</button>

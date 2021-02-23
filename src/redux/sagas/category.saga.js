@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { takeEvery, put } from 'redux-saga/effects';
+import { takeLatest, put } from 'redux-saga/effects';
 
 function* fetchCategorySaga() {
     try {
@@ -31,9 +31,9 @@ function* deleteCategorySaga(action) {
 };
 
 function* categorySaga() {
-    yield takeEvery('FETCH_CATEGORIES', fetchCategorySaga);
-    yield takeEvery('ADD_NEW_CATEGORY', addNewCategorySaga);
-    yield takeEvery('DELETE_CATEGORY', deleteCategorySaga);
+    yield takeLatest('FETCH_CATEGORIES', fetchCategorySaga);
+    yield takeLatest('ADD_NEW_CATEGORY', addNewCategorySaga);
+    yield takeLatest('DELETE_CATEGORY', deleteCategorySaga);
 };
 
 export default categorySaga;

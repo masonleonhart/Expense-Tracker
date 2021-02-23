@@ -15,7 +15,7 @@ router.post('/', rejectUnauthenticated, (req, res) => {
         return;
     };
 
-    pool.query(sqlQuery, [req.body.name]).then(() => {
+    pool.query(sqlQuery, [`${req.body.name}`]).then(() => {
         console.log('Added new category successfully');
         res.sendStatus(201);
     }).catch(err => {
@@ -42,7 +42,7 @@ router.get('/', rejectUnauthenticated, (req, res) => {
 
 // DELETE 
 
-router.delete('/:id', rejectUnauthenticated, async (req, res) => {
+router.delete('/:id', rejectUnauthenticated, (req, res) => {
     const sqlQuery = `DELETE FROM "category" WHERE "id" = ${req.params.id};`;
 
     pool.query(sqlQuery).then(() => {

@@ -47,7 +47,7 @@ function UserPage() {
                 <tr key={category.id}>
                   <td>{category.name}</td>
                   <td>${category.coalesce}</td>
-                  <td><button>Delete Category</button></td>
+                  <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
                 </tr>)}
             </tbody>
           </table >

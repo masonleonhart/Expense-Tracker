@@ -29,13 +29,27 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 router.get('/', rejectUnauthenticated, (req, res) => {
     const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(e.amount), 0) FROM "category" as c
                             FULL JOIN "expense" as e on c.id = e.category_id
-                            WHERE c.user_id = $1 GROUP BY c.id ORDER BY COALESCE DESC;`;
+                            WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
     
-    pool.query(newQueryText, [req.user.id]).then(result => {
+    pool.query(newQueryText).then(result => {
         console.log('Retrieved categories successfully');
         res.send(result.rows).status(200);
     }).catch(err => {
         console.log('Error in getting categories', err);
+        res.sendStatus(500);
+    });
+});
+
+// DELETE 
+
+router.delete('/:id', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `DELETE FROM "category" WHERE "id" = ${req.params.id};`;
+
+    pool.query(sqlQuery).then(() => {
+        console.log('Deleted category successfully');
+        res.sendStatus(204);
+    }).catch(err => {
+        console.log('Error in deleting category', err);
         res.sendStatus(500);
     });
 });

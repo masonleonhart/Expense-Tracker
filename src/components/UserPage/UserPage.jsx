@@ -32,6 +32,7 @@ function UserPage() {
   };
 
   useEffect(() => {
+    dispatch({ type: "CREATE_LINK_TOKEN" });
     dispatch({ type: 'FETCH_CATEGORIES' });
     dispatch({ type: 'FETCH_EXPENSES' });
   }, []);

@@ -11,7 +11,7 @@ const client = new plaid.Client({
     env: plaid.environments[process.env.PLAID_ENV]
 });
 
-router.post('create_link_token', rejectUnauthenticated, async (req, res) => {
+router.post('/create_link_token', rejectUnauthenticated, async (req, res) => {
     try {
         const tokenResponse = await client.createLinkToken({
             user: {
@@ -24,7 +24,7 @@ router.post('create_link_token', rejectUnauthenticated, async (req, res) => {
         });
 
         console.log('Created link token successfully');
-        res.sendStatus(tokenResponse).status(201);
+        res.send(tokenResponse).status(201);
     } catch (error) {
         console.log('Error in getting link token', error);
         res.sendStatus(500);

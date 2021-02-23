@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 
 function UserPageCategory() {
-    const category = useSelector(store => store.category);
+    const categories = useSelector(store => store.category.categoryReducer);
 
     return (
         <>
@@ -15,14 +15,12 @@ function UserPageCategory() {
                     </tr>
                 </thead>
                 <tbody>
-                    {category.categoryReducer.map(category =>
+                    {categories.map(category =>
                         <tr key={category.id}>
-                            <td><p>{category.name}</p></td>
-                            <td><p>${category.sum}</p></td>
+                            <td>{category.name}</td>
+                            <td>${category.sum}</td>
                             <td><button>Delete Category</button></td>
-                        </tr>
-                    )}
-
+                        </tr>)}
                 </tbody>
             </table >
         </>

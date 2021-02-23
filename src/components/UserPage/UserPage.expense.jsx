@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 
 function UserPageExpense() {
-    const Expense = useSelector(store => store.Expense);
+    const expenses = useSelector(store => store.expense.expenseReducer);
 
     return (
         <>
@@ -13,9 +13,18 @@ function UserPageExpense() {
                         <th>Amount</th>
                         <th>Date</th>
                         <th>Category</th>
-                        <th>Add Expense</th>
+                        <th><button>Add Expense</button></th>
                     </tr>
                 </thead>
+                <tbody>
+                    {expenses.map(expense => <tr key={expense.id}>
+                        <td>{expense.name}</td>
+                        <td>${expense.amount}</td>
+                        <td>{expense.date}</td>
+                        <td>{expense.category_id}</td>
+                        <td><button>Delete Expense</button></td>
+                    </tr>)}
+                </tbody>
             </table>
         </>
     );

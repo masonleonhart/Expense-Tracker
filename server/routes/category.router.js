@@ -30,7 +30,7 @@ router.get('/', rejectUnauthenticated, (req, res) => {
     const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(e.amount), 0) FROM "category" as c
                             FULL JOIN "expense" as e on c.id = e.category_id
                             WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
-    
+
     pool.query(newQueryText).then(result => {
         console.log('Retrieved categories successfully');
         res.send(result.rows).status(200);
@@ -42,7 +42,7 @@ router.get('/', rejectUnauthenticated, (req, res) => {
 
 // DELETE 
 
-router.delete('/:id', rejectUnauthenticated, (req, res) => {
+router.delete('/:id', rejectUnauthenticated, async (req, res) => {
     const sqlQuery = `DELETE FROM "category" WHERE "id" = ${req.params.id};`;
 
     pool.query(sqlQuery).then(() => {

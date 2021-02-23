@@ -13,8 +13,8 @@ function* fetchExpensesSaga() {
 function* addNewExpenseSaga(action) {
     try {
         yield axios.post('/api/expense', action.payload);
-        yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'FETCH_CATEGORIES' });
+        yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'RESET_NEW_EXPENSE_REDUCER' });
     } catch (error) {
         console.log('Error in adding new expense', error);
@@ -24,8 +24,8 @@ function* addNewExpenseSaga(action) {
 function* updateExpenseCategorySaga(action) {
     try {
         yield axios.put(`/api/expense/unassigned/${action.payload.expense_id}`, { category_id: action.payload.category_id });
-        yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'FETCH_CATEGORIES' });
+        yield put({ type: 'FETCH_EXPENSES' });
     } catch (error) {
         console.log('Error in updating expense category', error);
     };
@@ -34,8 +34,8 @@ function* updateExpenseCategorySaga(action) {
 function* deleteExpenseSaga(action) {
     try {
         yield axios.delete(`/api/expense/${action.payload}`);
-        yield put({ type: 'FETCH_EXPENSES' });
         yield put({ type: 'FETCH_CATEGORIES' });
+        yield put({ type: 'FETCH_EXPENSES' });
     } catch (error) {
         console.log('Error in updating expense category', error);
     };

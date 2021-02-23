@@ -7,9 +7,11 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 
 router.post('/', rejectUnauthenticated, (req, res) => {
     const sqlQuery = `INSERT INTO "expense" ("user_id", "category_id", "name", "amount", "date")
-                        VALUES (${req.user.id}, NULL, $1, $2, $3);`;
+                        VALUES (${req.user.id}, $1, $2, $3, $4);`;
+
+    let category_id = req.body.category_id === 0 ? null : req.body.category_id;
     
-    pool.query(sqlQuery, [req.body.name, req.body.amount, req.body.date]).then(() => {
+    pool.query(sqlQuery, [category_id, req.body.name, req.body.amount, req.body.date]).then(() => {
         console.log('Added new expense successfully');
         res.sendStatus(201);
     }).catch(err => {
@@ -28,6 +30,21 @@ router.get('/', rejectUnauthenticated, (req, res) => {
         res.send(response.rows).status(200);
     }).catch(err => {
         console.log('Error in getting expenses', err);
+        res.sendStatus(500);
+    });
+});
+
+// PUT
+
+router.put('/unassigned/:id', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `UPDATE "expense" SET "category_id" = ${req.body.category_id}
+                        WHERE id = ${req.params.id};`;
+
+    pool.query(sqlQuery).then(() => {
+        console.log('Updated unassigned category successfully');
+        res.sendStatus(200);
+    }).catch(err => {
+        console.log('Error in updating unassigned category', err);
         res.sendStatus(500);
     });
 });

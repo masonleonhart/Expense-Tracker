@@ -9,10 +9,13 @@ const expenseReducer = (state = [], action) => {
     };
 };
 
-const newExpenseReducer = (state = { category_id: 'Set Category', name: '', amount: '', date: '' }, action) => {
+const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date: '' }, action) => {
     let newState = { ...state };
 
     switch (action.type) {
+        case 'SET_NEW_EXPENSE_CATEGORY':
+            newState.category_id = action.payload;
+            return newState;
         case 'SET_NEW_EXPENSE_NAME':
             newState.name = action.payload;
             return newState;
@@ -22,6 +25,8 @@ const newExpenseReducer = (state = { category_id: 'Set Category', name: '', amou
         case 'SET_NEW_EXPENSE_DATE':
             newState.date = action.payload;
             return newState;
+        case 'RESET_NEW_EXPENSE_REDUCER':
+            return state = { category_id: 0, name: '', amount: '', date: '' };
         default:
             return state;
     }

@@ -9,8 +9,14 @@ router.post('/', rejectUnauthenticated, (req, res) => {
     const sqlQuery = `INSERT INTO "expense" ("user_id", "category_id", "name", "amount", "date")
                         VALUES (${req.user.id}, $1, $2, $3, $4);`;
 
+    if (!req.body.name, !req.body.amount, !req.body.date) {
+        console.log('Try again with valid fields');
+        res.sendStatus(400);
+        return;
+    };
+
     let category_id = req.body.category_id === 0 ? null : req.body.category_id;
-    
+
     pool.query(sqlQuery, [category_id, req.body.name, req.body.amount, req.body.date]).then(() => {
         console.log('Added new expense successfully');
         res.sendStatus(201);
@@ -23,7 +29,10 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 // GET
 
 router.get('/', rejectUnauthenticated, (req, res) => {
-    const sqlQuery = `SELECT * FROM "expense" WHERE "user_id" = ${req.user.id}`;
+    const sqlQuery = `SELECT e.id, e.user_id, e.name, e.amount, e.date, e.transaction_id, c.id as category_id, c.name as category_name
+                        FROM "expense" as e
+                        FULL JOIN "category" as c on e.category_id = c.id
+                        WHERE e.id IS NOT NULL AND e.user_id = ${req.user.id} ORDER BY e.date DESC`;
 
     pool.query(sqlQuery).then(response => {
         console.log('Retrieved expenses successfully ');

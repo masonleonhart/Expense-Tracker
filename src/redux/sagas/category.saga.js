@@ -10,8 +10,19 @@ function* fetchCategorySaga() {
     };
 };
 
+function* addNewCategorySaga(action) {
+    try {
+        yield axios.post('/api/category', action.payload);
+        yield put({ type: 'FETCH_CATEGORIES' });
+        yield put({ type: 'RESET_NEW_CATEGORY_REDUCER' });
+    } catch (error) {
+        console.log('Error in adding new expense', error);
+    };
+};
+
 function* categorySaga() {
     yield takeEvery('FETCH_CATEGORIES', fetchCategorySaga);
+    yield takeEvery('ADD_NEW_CATEGORY', addNewCategorySaga);
 };
 
 export default categorySaga;

@@ -9,6 +9,21 @@ const categoryReducer = (state = [], action) => {
     };
 };
 
+const newCategoryReducer = (state = { name: '' }, action) => {
+    let newState = { ...state };
+
+    switch (action.type) {
+        case 'SET_NEW_CATEGORY_NAME':
+            newState.name = action.payload;
+            return newState;
+        case 'RESET_NEW_EXPENSE_REDUCER':
+            return state = { name: '' };
+        default:
+            return state;
+    }
+};
+
 export default combineReducers({
     categoryReducer,
+    newCategoryReducer,
 });

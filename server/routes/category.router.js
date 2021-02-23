@@ -3,64 +3,41 @@ const pool = require('../modules/pool');
 const router = express.Router();
 const { rejectUnauthenticated } = require('../modules/authentication-middleware');
 
-// router.get('/list', rejectUnauthenticated, (req, res) => {
-//     const queryText = `SELECT * FROM "category" WHERE "user_id" = ${req.user.id}`;
-
-//     pool.query(queryText).then(async response => {
-//         let payload = { categories: response.rows, sums: [] }
-//         const newQueryText = `SELECT c.id, c.name, SUM(e.amount) FROM "category" as c
-//                                 JOIN "expense" as e on c.id = e.category_id
-//                                 WHERE c.id = $1 GROUP BY c.id;`;
-
-//         for (const category of response.rows) {
-//             const result = await pool.query(newQueryText, [category.id]); //.then(result => {
-//             console.log(result.rows[0])
-//             payload.sums.push(result.rows[0]);
-//             // }).catch(err => {
-//             //     console.log(`Error fetching sum for category at id: ${category.id}`, err);
-//             //     res.sendStatus(500);
-//             // });
-//         };
-
-//         console.log(payload)
-//         console.log('Retrieved categories successfully');
-//         res.send(payload).status(200);
-//     }).catch(err => {
-//         console.log('Error in getting categories', err);
-//         res.sendStatus(500);
-//     });
-// });
-
-
 // POST
 
+router.post('/', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `INSERT INTO "category" ("user_id", "name")
+                        VALUES (${req.user.id}, $1);`;
 
+    if (!req.body.name) {
+        console.log('Try again with a valid field');
+        res.sendStatus(400);
+        return;
+    };
+
+    pool.query(sqlQuery, [req.body.name]).then(() => {
+        console.log('Added new category successfully');
+        res.sendStatus(201);
+    }).catch(err => {
+        console.log('Error in adding category', err);
+        res.sendStatus(500);
+    });
+});
 
 // GET
 
-router.get('/', rejectUnauthenticated, async (req, res) => {
-    const queryText = `SELECT * FROM "category" WHERE "user_id" = ${req.user.id}`;
-
-    try {
-        const response = await pool.query(queryText);
-
-        let categories = [];
-
-        const newQueryText = `SELECT c.id, c.name, SUM(e.amount) FROM "category" as c
-                                JOIN "expense" as e on c.id = e.category_id
-                                WHERE c.id = $1 GROUP BY c.id;`;
-
-        for (const category of response.rows) {
-            const result = await pool.query(newQueryText, [category.id]);
-            categories.push(result.rows[0]);
-        };
-
+router.get('/', rejectUnauthenticated, (req, res) => {
+    const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(e.amount), 0) FROM "category" as c
+                            FULL JOIN "expense" as e on c.id = e.category_id
+                            WHERE c.user_id = $1 GROUP BY c.id ORDER BY COALESCE DESC;`;
+    
+    pool.query(newQueryText, [req.user.id]).then(result => {
         console.log('Retrieved categories successfully');
-        res.send(categories).status(200);
-    } catch (err) {
+        res.send(result.rows).status(200);
+    }).catch(err => {
         console.log('Error in getting categories', err);
         res.sendStatus(500);
-    };
+    });
 });
 
 module.exports = router;

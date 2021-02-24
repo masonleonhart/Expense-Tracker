@@ -2,6 +2,7 @@ const express = require('express');
 const pool = require('../modules/pool');
 const router = express.Router();
 const { rejectUnauthenticated } = require('../modules/authentication-middleware');
+const moment = require('moment');
 
 // POST
 
@@ -49,12 +50,14 @@ router.post('/income', rejectUnauthenticated, (req, res) => {
 
 // GET
 
-router.get('/', rejectUnauthenticated, (req, res) => {
-    const sqlQuery = `SELECT th.id, th.user_id, th.name, th.amount, th.date, th.transaction_id, th.income, 
+router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `SELECT th.id, th.name, th.amount, th.date, th.transaction_id, th.income, 
                                 c.id as category_id, c.name as category_name
                         FROM "transaction-history" as th
                         FULL JOIN "category" as c on th.category_id = c.id
-                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id} ORDER BY th.date DESC;`;
+                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id}
+                        AND c.name IS NULL AND th.income = FALSE
+                        ORDER BY th.date DESC;`;
 
     pool.query(sqlQuery).then(response => {
         console.log('Retrieved expenses successfully ');
@@ -63,6 +66,26 @@ router.get('/', rejectUnauthenticated, (req, res) => {
         console.log('Error in getting expenses', err);
         res.sendStatus(500);
     });
+});
+
+router.get('/daily/:day', rejectUnauthenticated, async (req, res) => {
+    const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
+    const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income,
+                                c.id as category_id, c.name as category_name
+                        FROM "transaction-history" as th
+                        FULL JOIN "category" as c on th.category_id = c.id
+                        WHERE th.id IS NOT NULL AND th.user_id = 1 AND th.date = $1
+                        ORDER BY th.date DESC;`;
+    
+    try {
+        const response = await pool.query(sqlQuery, [`${dayToQuery}`]);
+
+        console.log('Retrieved daily transactions successfully');
+        res.send(response.rows).status(200);
+    } catch (error) {
+        console.log('Error in fetching daily transactions', error);
+        res.sendStatus(500);
+    };
 });
 
 // PUT

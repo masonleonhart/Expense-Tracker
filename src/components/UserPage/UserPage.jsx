@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlaidLink } from 'react-plaid-link';
 import axios from 'axios';
+import moment from 'moment';
 
 import './UserPage.css'
 
@@ -52,7 +53,7 @@ function UserPage() {
   useEffect(() => {
     dispatch({ type: 'FETCH_LINK_TOKEN', payload: user.access_token });
     dispatch({ type: 'FETCH_CATEGORIES' });
-    user.access_token ? dispatch({ type: 'FETCH_PLAID_TRANSACTIONS' }) : dispatch({ type: 'FETCH_EXPENSES' });
+    user.access_token ? dispatch({ type: 'FETCH_PLAID_TRANSACTIONS' }) : dispatch({ type: 'FETCH_UNCATEGORIZED' });
   }, []);
 
   return (
@@ -104,7 +105,7 @@ function UserPage() {
               {category.categoryReducer.map(category =>
                 <tr key={category.id}>
                   <td>{category.name}</td>
-                  <td>${category.coalesce}</td>
+                  <td>{toCurrency.format(category.coalesce)}</td>
                   <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
                 </tr>)}
             </tbody>
@@ -113,9 +114,9 @@ function UserPage() {
           <br />
         </>
       }
-      <h2>Transaction Hisory</h2>
+      <h2>Uncategorized Transactions</h2>
       <div id='expense-container'>
-        {category.categoryReducer.length > 0 ?
+        {category.categoryReducer.length > 0 && expense.uncategorizedExpenseReducer.length > 0 ?
           <table id='expense-table'>
             <thead>
               <tr>
@@ -130,10 +131,10 @@ function UserPage() {
               </tr>
             </thead>
             <tbody>
-              {expense.expenseReducer.map(expense => <tr key={expense.id}>
+              {expense.uncategorizedExpenseReducer.map(expense => <tr key={expense.id}>
                 <td>{expense.name}</td>
                 <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                <td>{expense.date}</td>
+                <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
                 <td>
                   {expense.category_id === null && expense.income === true ? <></>
                     : expense.category_id === null ?
@@ -182,15 +183,15 @@ function UserPage() {
             <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
               <label htmlFor="income-name-input">Income Name</label>
               <br />
-              <input type="text" id='income-name-input' value={expense.expenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
+              <input type="text" id='income-name-input' value={expense.newIncomeReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
               <br />
               <label htmlFor="income-amount-input">Income Amount</label>
               <br />
-              <input type="number" id="income-amount-input" value={expense.expenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
+              <input type="number" id="income-amount-input" value={expense.newIncomeReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
               <br />
               <label htmlFor="income-date-input">Income Date</label>
               <br />
-              <input type="date" id='income-date-input' value={expense.expenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
+              <input type="date" id='income-date-input' value={expense.newIncomeReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
               <br />
               <br />
               <button type='reset'>Cancel</button>

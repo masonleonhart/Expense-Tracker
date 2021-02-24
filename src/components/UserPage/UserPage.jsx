@@ -116,7 +116,7 @@ function UserPage() {
       }
       <h2>Transaction Hisory</h2>
       <div id='expense-container'>
-        {category.categoryReducer.length > 0 ?
+        {category.categoryReducer.length > 0 && expense.expenseReducer.length > 0 ?
           <table id='expense-table'>
             <thead>
               <tr>

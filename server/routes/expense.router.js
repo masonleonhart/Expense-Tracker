@@ -50,12 +50,14 @@ router.post('/income', rejectUnauthenticated, (req, res) => {
 
 // GET
 
-router.get('/', rejectUnauthenticated, (req, res) => {
-    const sqlQuery = `SELECT th.id, th.user_id, th.name, th.amount, th.date, th.transaction_id, th.income, 
+router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `SELECT th.id, th.name, th.amount, th.date, th.transaction_id, th.income, 
                                 c.id as category_id, c.name as category_name
                         FROM "transaction-history" as th
                         FULL JOIN "category" as c on th.category_id = c.id
-                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id} ORDER BY th.date DESC;`;
+                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id}
+                        AND c.name IS NULL AND th.income = FALSE
+                        ORDER BY th.date DESC;`;
 
     pool.query(sqlQuery).then(response => {
         console.log('Retrieved expenses successfully ');
@@ -66,7 +68,7 @@ router.get('/', rejectUnauthenticated, (req, res) => {
     });
 });
 
-router.get('/daily/:day', async (req, res) => {
+router.get('/daily/:day', rejectUnauthenticated, async (req, res) => {
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income,
                                 c.id as category_id, c.name as category_name

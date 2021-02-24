@@ -24,7 +24,7 @@ function* deleteCategorySaga(action) {
     try {
         yield axios.delete(`/api/category/${action.payload}`);
         yield put({ type: 'FETCH_CATEGORIES' });
-        yield put({ type: 'FETCH_EXPENSES' });
+        yield put({ type: 'FETCH_UNCATEGORIZED' });
     } catch (error) {
         console.log('Error in adding new expense', error);
     };

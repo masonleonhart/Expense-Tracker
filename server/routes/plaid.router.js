@@ -11,7 +11,9 @@ const client = new plaid.Client({
     env: plaid.environments[process.env.PLAID_ENV]
 });
 
-router.post('/create_link_token', rejectUnauthenticated, async (req, res) => {
+// POST
+
+router.post('/link_token', rejectUnauthenticated, async (req, res) => {
     try {
         const tokenResponse = await client.createLinkToken({
             user: {
@@ -38,11 +40,45 @@ router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
     try {
         const response = await client.exchangePublicToken(PUBLIC_TOKEN);
         await pool.query(sqlQuery, [response.access_token]);
-        
+
         console.log('Exchanged tokens successfully');
         res.sendStatus(200);
     } catch (error) {
         console.log('Error in exchanging tokens', error); 
+        res.sendStatus(500);
+    };
+});
+
+// GET
+
+router.get('/transactions', rejectUnauthenticated, async (req, res) => {
+    const dateToday = moment().format(`YYYY-MM-DD`);
+    const earlierDate = moment().subtract(1, 'month').format('YYYY-MM-DD');
+
+    const sqlQueryOne = `SELECT * FROM "expense" WHERE "user_id" = ${req.user.id} ORDER BY "date" DESC;`;
+    const sqlQueryTwo = `INSERT INTO "expense" ("income", "user_id", "name", "amount", "date", "transaction_id")
+                            VALUES (TRUE, ${req.user.id}, $1, $2, $3, $4);`;
+    const sqlQueryThree = `INSERT INTO "expense" ("user_id", "name", "amount", "date", "transaction_id")
+                            VALUES (${req.user.id}, $1, $2, $3, $4);`;
+
+    try {
+        const queryResponseOne = await pool.query(sqlQueryOne);
+        const plaidResponse = await client.getTransactions(req.user.access_token, earlierDate, dateToday);
+
+        for (const newTransaction of plaidResponse.transactions) {
+            if (!queryResponseOne.rows.some(oldTransaction => oldTransaction.transaction_id === newTransaction.transaction_id)) {
+                if (newTransaction.amount < 0) {
+                    await pool.query(sqlQueryTwo, [newTransaction.name, newTransaction.amount, newTransaction.date, newTransaction.transaction_id]);
+                } else {
+                    await pool.query(sqlQueryThree, [newTransaction.name, newTransaction.amount, newTransaction.date, newTransaction.transaction_id]);
+                };
+            };
+        };
+
+        console.log('Retrieved plaid transactions successfully');
+        res.sendStatus(200);
+    } catch (error) {
+        console.log('Error in getting plaid transactions', error);
         res.sendStatus(500);
     };
 });

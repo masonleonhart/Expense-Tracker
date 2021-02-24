@@ -11,6 +11,7 @@ function UserPage() {
   const expense = useSelector(store => store.expense);
   const category = useSelector(store => store.category);
   const plaid = useSelector(store => store.plaid);
+  const user = useSelector(store => store.user);
 
   let [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
   let [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
@@ -18,7 +19,8 @@ function UserPage() {
 
   const plaidLinkSuccess = React.useCallback(async public_token => {
     try {
-      const response = await axios.post('/api/plaid/exchange_token', { public_token });
+      await axios.post('/api/plaid/exchange_token', { public_token });
+      setTimeout(() => dispatch({ type: 'FETCH_USER' }), 3000);
     } catch (error) {
       console.log('Error in exchanging tokens', error);
     };
@@ -45,19 +47,18 @@ function UserPage() {
   useEffect(() => {
     dispatch({ type: 'FETCH_LINK_TOKEN' });
     dispatch({ type: 'FETCH_CATEGORIES' });
-    dispatch({ type: 'FETCH_EXPENSES' });
+    user.access_token ? dispatch({ type: 'FETCH_PLAID_TRANSACTIONS' }) : dispatch({ type: 'FETCH_EXPENSES' });
   }, []);
-
-  console.log(plaid)
 
   return (
     <div className="container">
-      <PlaidLink
-        token={plaid.linkToken}
-        onSuccess={plaidLinkSuccess}
-      >
-        Connect to your Bank
-      </PlaidLink>
+      {!user.access_token &&
+        <PlaidLink
+          token={plaid.linkToken}
+          onSuccess={plaidLinkSuccess}
+        >
+          Connect to your Bank
+      </PlaidLink>}
       <h2>Categories</h2>
       {toggleCategoryAddForm &&
         <>

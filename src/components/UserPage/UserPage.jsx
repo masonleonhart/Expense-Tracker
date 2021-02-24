@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { PlaidLink } from 'react-plaid-link';
+import axios from 'axios';
 
 import './UserPage.css'
 
@@ -8,10 +10,26 @@ function UserPage() {
   const dispatch = useDispatch();
   const expense = useSelector(store => store.expense);
   const category = useSelector(store => store.category);
+  const plaid = useSelector(store => store.plaid);
+  const user = useSelector(store => store.user);
 
   let [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
   let [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
   let [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
+
+  const plaidLinkSuccess = React.useCallback(async public_token => {
+    try {
+      await axios.post('/api/plaid/exchange_token', { public_token });
+      setTimeout(() => dispatch({ type: 'FETCH_USER' }), 3000);
+    } catch (error) {
+      console.log('Error in exchanging tokens', error);
+    };
+  });
+
+  const toCurrency = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
 
   const handleCategorySubmit = e => {
     e.preventDefault();
@@ -32,13 +50,31 @@ function UserPage() {
   };
 
   useEffect(() => {
-    dispatch({ type: 'FETCH_LINK_TOKEN' });
+    dispatch({ type: 'FETCH_LINK_TOKEN', payload: user.access_token });
     dispatch({ type: 'FETCH_CATEGORIES' });
-    dispatch({ type: 'FETCH_EXPENSES' });
+    user.access_token ? dispatch({ type: 'FETCH_PLAID_TRANSACTIONS' }) : dispatch({ type: 'FETCH_EXPENSES' });
   }, []);
 
   return (
     <div className="container">
+      {!user.access_token &&
+        <PlaidLink
+          token={plaid.linkToken}
+          onSuccess={plaidLinkSuccess}
+        >
+          Connect to your Bank
+      </PlaidLink>}
+      {plaid.plaidError &&
+        <>
+          <p>There was an error with Plaid, please update your bank credentials.</p>
+          <PlaidLink
+            token={plaid.linkToken}
+            onSuccess={(public_token, metadata) => setTimeout(() => { dispatch({ type: 'SET_PLAID_ERROR_FALSE' }); dispatch({ type: 'FETCH_USER' }) }, 3000)}
+          >
+            Update your credentials
+          </PlaidLink>
+        </>
+      }
       <h2>Categories</h2>
       {toggleCategoryAddForm &&
         <>
@@ -77,7 +113,7 @@ function UserPage() {
           <br />
         </>
       }
-      <h2>Expenses</h2>
+      <h2>Transaction Hisory</h2>
       <div id='expense-container'>
         {category.categoryReducer.length > 0 ?
           <table id='expense-table'>
@@ -96,17 +132,18 @@ function UserPage() {
             <tbody>
               {expense.expenseReducer.map(expense => <tr key={expense.id}>
                 <td>{expense.name}</td>
-                <td>${expense.amount}</td>
+                <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
                 <td>{expense.date}</td>
                 <td>
-                  {expense.category_id === null && expense.income === true ? <></> : expense.category_id === null ?
-                    <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
-                      <option value="0">Select a Category</option>
-                      {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
-                    </select> : expense.category_name
+                  {expense.category_id === null && expense.income === true ? <></>
+                    : expense.category_id === null ?
+                      <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
+                        <option value="0">Select a Category</option>
+                        {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
+                      </select> : expense.category_name
                   }
                 </td>
-                <td><button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Expense</button></td>
+                <td>{!expense.transaction_id && <button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Item</button>}</td>
               </tr>)}
             </tbody>
           </table> : <></>}

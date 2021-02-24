@@ -27,8 +27,8 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 // GET
 
 router.get('/', rejectUnauthenticated, (req, res) => {
-    const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(e.amount), 0) FROM "category" as c
-                            FULL JOIN "expense" as e on c.id = e.category_id
+    const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(th.amount), 0) FROM "category" as c
+                            FULL JOIN "transaction-history" as th on c.id = th.category_id
                             WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
 
     pool.query(newQueryText).then(result => {

@@ -5,3 +5,11 @@
 table {
     text-align: center;
 }
+
+.income-amount {
+    background-color: rgba(0, 255, 0, 0.404);
+}
+
+.expense-amount {
+    background-color: rgba(255, 0, 0, 0.404);
+}

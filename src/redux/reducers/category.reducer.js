@@ -16,7 +16,7 @@ const newCategoryReducer = (state = { name: '' }, action) => {
         case 'SET_NEW_CATEGORY_NAME':
             newState.name = action.payload;
             return newState;
-        case 'RESET_NEW_EXPENSE_REDUCER':
+        case 'RESET_NEW_CATEGORY_REDUCER':
             return state = { name: '' };
         default:
             return state;

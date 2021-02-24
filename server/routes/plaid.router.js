@@ -15,18 +15,33 @@ const client = new plaid.Client({
 
 router.post('/link_token', rejectUnauthenticated, async (req, res) => {
     try {
-        const tokenResponse = await client.createLinkToken({
-            user: {
-                client_user_id: `${req.user.id}`
-            },
-            client_name: 'Expense Tracker',
-            products: ['transactions'],
-            country_codes: ['US'],
-            language: 'en'
-        });
+        if (req.body.access_token) {
+            const tokenResponse = await client.createLinkToken({
+                user: {
+                    client_user_id: `${req.user.id}`
+                },
+                client_name: 'solo spike',
+                country_codes: ['US'],
+                language: 'en',
+                access_token: req.body.access_token
+            });
 
-        console.log('Created link token successfully');
-        res.send(tokenResponse).status(201);
+            console.log('Created link token successfully');
+            res.send(tokenResponse).status(201);
+        } else {
+            const tokenResponse = await client.createLinkToken({
+                user: {
+                    client_user_id: `${req.user.id}`
+                },
+                client_name: 'Expense Tracker',
+                products: ['transactions'],
+                country_codes: ['US'],
+                language: 'en'
+            });
+
+            console.log('Created link token successfully');
+            res.send(tokenResponse).status(201);
+        };
     } catch (error) {
         console.log('Error in getting link token', error);
         res.sendStatus(500);
@@ -44,7 +59,7 @@ router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
         console.log('Exchanged tokens successfully');
         res.sendStatus(200);
     } catch (error) {
-        console.log('Error in exchanging tokens', error); 
+        console.log('Error in exchanging tokens', error);
         res.sendStatus(500);
     };
 });
@@ -55,10 +70,10 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
     const dateToday = moment().format(`YYYY-MM-DD`);
     const earlierDate = moment().subtract(1, 'month').format('YYYY-MM-DD');
 
-    const sqlQueryOne = `SELECT * FROM "expense" WHERE "user_id" = ${req.user.id} ORDER BY "date" DESC;`;
-    const sqlQueryTwo = `INSERT INTO "expense" ("income", "user_id", "name", "amount", "date", "transaction_id")
+    const sqlQueryOne = `SELECT * FROM "transaction-history" WHERE "user_id" = ${req.user.id} ORDER BY "date" DESC;`;
+    const sqlQueryTwo = `INSERT INTO "transaction-history" ("income", "user_id", "name", "amount", "date", "transaction_id")
                             VALUES (TRUE, ${req.user.id}, $1, $2, $3, $4);`;
-    const sqlQueryThree = `INSERT INTO "expense" ("user_id", "name", "amount", "date", "transaction_id")
+    const sqlQueryThree = `INSERT INTO "transaction-history" ("user_id", "name", "amount", "date", "transaction_id")
                             VALUES (${req.user.id}, $1, $2, $3, $4);`;
 
     try {
@@ -68,9 +83,9 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
         for (const newTransaction of plaidResponse.transactions) {
             if (!queryResponseOne.rows.some(oldTransaction => oldTransaction.transaction_id === newTransaction.transaction_id)) {
                 if (newTransaction.amount < 0) {
-                    await pool.query(sqlQueryTwo, [newTransaction.name, newTransaction.amount, newTransaction.date, newTransaction.transaction_id]);
+                    await pool.query(sqlQueryTwo, [`${newTransaction.name}`, Number(newTransaction.amount), `${newTransaction.date}`, `${newTransaction.transaction_id}`]);
                 } else {
-                    await pool.query(sqlQueryThree, [newTransaction.name, newTransaction.amount, newTransaction.date, newTransaction.transaction_id]);
+                    await pool.query(sqlQueryThree, [`${newTransaction.name}`, Number(newTransaction.amount), `${newTransaction.date}`, `${newTransaction.transaction_id}`]);
                 };
             };
         };
@@ -79,6 +94,18 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
         res.sendStatus(200);
     } catch (error) {
         console.log('Error in getting plaid transactions', error);
+        res.sendStatus(500);
+    };
+});
+
+router.post('/sandbox/reset_login', (req, res) => {
+    try {
+        client.resetLogin(req.body.access_token).then(() => {
+            console.log('Reset login successfully');
+            res.sendStatus(200);
+        });
+    } catch (error) {
+        console.log('Error in resetting login', error);
         res.sendStatus(500);
     };
 });

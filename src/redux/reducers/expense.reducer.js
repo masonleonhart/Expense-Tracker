@@ -1,9 +1,26 @@
 import { combineReducers } from 'redux';
+import moment from 'moment';
 
 const expenseReducer = (state = [], action) => {
     switch (action.type) {
         case 'SET_EXPENSES':
             return action.payload;
+        default:
+            return state;
+    };
+};
+
+const currentDayReducer = (state = 0, action) => {
+    switch (action.type) {
+        case 'INCREMENT_DAY':
+            state++;
+            return state++;
+        case 'DECREMENT_DAY':
+            state--;
+            return state++;
+        case 'SET_DAY':
+            state += action.payload;
+            return state;
         default:
             return state;
     };
@@ -55,5 +72,6 @@ const newIncomeReducer = (state = { income: true, name: '', amount: '', date: ''
 export default combineReducers({
     expenseReducer,
     newExpenseReducer,
-    newIncomeReducer
+    newIncomeReducer,
+    currentDayReducer,
 });

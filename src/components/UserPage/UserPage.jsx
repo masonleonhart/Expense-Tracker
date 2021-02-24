@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlaidLink } from 'react-plaid-link';
 import axios from 'axios';
+import moment from 'moment';
 
 import './UserPage.css'
 
@@ -104,7 +105,7 @@ function UserPage() {
               {category.categoryReducer.map(category =>
                 <tr key={category.id}>
                   <td>{category.name}</td>
-                  <td>${category.coalesce}</td>
+                  <td>{toCurrency.format(category.coalesce)}</td>
                   <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
                 </tr>)}
             </tbody>
@@ -133,7 +134,7 @@ function UserPage() {
               {expense.expenseReducer.map(expense => <tr key={expense.id}>
                 <td>{expense.name}</td>
                 <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                <td>{expense.date}</td>
+                <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
                 <td>
                   {expense.category_id === null && expense.income === true ? <></>
                     : expense.category_id === null ?

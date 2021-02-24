@@ -31,4 +31,20 @@ router.post('/create_link_token', rejectUnauthenticated, async (req, res) => {
     };
 });
 
+router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
+    const PUBLIC_TOKEN = req.body.public_token;
+    const sqlQuery = `UPDATE "user" SET "access_token" = $1 WHERE ID = ${req.user.id};`;
+
+    try {
+        const response = await client.exchangePublicToken(PUBLIC_TOKEN);
+        await pool.query(sqlQuery, [response.access_token]);
+        
+        console.log('Exchanged tokens successfully');
+        res.sendStatus(200);
+    } catch (error) {
+        console.log('Error in exchanging tokens', error); 
+        res.sendStatus(500);
+    };
+});
+
 module.exports = router;

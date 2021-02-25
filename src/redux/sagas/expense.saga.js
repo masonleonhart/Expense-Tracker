@@ -13,8 +13,9 @@ function* fetchUncategorizedSaga() {
 function* fetchDailyExpensesSaga(action) {
     try {
         const response = yield axios.get(`/api/expense/daily/${action.payload.currentDay}`);
-        yield put({ type: 'SET_DAILY_EXPENSES', payload: response.data });
-        yield put({ type: 'SET_DAY', payload: action.payload.incomingDay })
+        yield put({ type: 'SET_DAILY_EXPENSES', payload: response.data.transactions });
+        yield put({ type: 'SET_DAILY_CATEGORIES', payload: response.data.categories });
+        yield put({ type: 'SET_DAY', payload: action.payload.incomingDay });
     } catch (error) {
         console.log('Error in fetching daily expenses', error);
     };

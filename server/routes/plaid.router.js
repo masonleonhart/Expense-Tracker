@@ -75,6 +75,8 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
                             VALUES (TRUE, ${req.user.id}, $1, $2, $3, $4);`;
     const sqlQueryThree = `INSERT INTO "transaction-history" ("user_id", "name", "amount", "date", "transaction_id")
                             VALUES (${req.user.id}, $1, $2, $3, $4);`;
+    const SqlQueryFour = `INSERT INTO "subcategory" ("user_id", "name", "transaction_id")
+                            VALUES (${req.user.id}, $1, $2);`;
 
     try {
         const queryResponseOne = await pool.query(sqlQueryOne);
@@ -86,6 +88,9 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
                     await pool.query(sqlQueryTwo, [`${newTransaction.name}`, Number(newTransaction.amount), `${newTransaction.date}`, `${newTransaction.transaction_id}`]);
                 } else {
                     await pool.query(sqlQueryThree, [`${newTransaction.name}`, Number(newTransaction.amount), `${newTransaction.date}`, `${newTransaction.transaction_id}`]);
+                    for (const category of newTransaction.category) {
+                        await pool.query(SqlQueryFour, [category, newTransaction.transaction_id]);
+                    };
                 };
             };
         };

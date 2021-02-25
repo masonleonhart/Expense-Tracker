@@ -18,7 +18,7 @@ function InfoPage() {
   };
 
   useEffect(() => {
-    dispatch({ type: 'FETCH_DAILY_EXPENSES', payload: {incomingDay: 0, currentDay} });
+    dispatch({ type: 'FETCH_DAILY_EXPENSES', payload: { incomingDay: 0, currentDay } });
   }, []);
 
   return (
@@ -36,7 +36,24 @@ function InfoPage() {
       <br />
       <br />
       <br />
-      <table id='expense-table' style={{ margin: 'auto' }}>
+      <table style={{ margin: 'auto' }}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Total Spent in Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          {category.dailyCategoryReducer.map(category =>
+            <tr key={category.id}>
+              <td>{category.name}</td>
+              <td>{toCurrency.format(category.sum)}</td>
+            </tr>)}
+        </tbody>
+      </table >
+      <br />
+      <br />
+      <table style={{ margin: 'auto' }}>
         <thead>
           <tr>
             <th>Name</th>

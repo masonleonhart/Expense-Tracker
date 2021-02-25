@@ -9,6 +9,15 @@ const categoryReducer = (state = [], action) => {
     };
 };
 
+const dailyCategoryReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'SET_DAILY_CATEGORIES':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
 const newCategoryReducer = (state = { name: '' }, action) => {
     let newState = { ...state };
 
@@ -25,5 +34,6 @@ const newCategoryReducer = (state = { name: '' }, action) => {
 
 export default combineReducers({
     categoryReducer,
+    dailyCategoryReducer,
     newCategoryReducer,
 });

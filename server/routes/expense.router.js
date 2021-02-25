@@ -74,14 +74,24 @@ router.get('/daily/:day', rejectUnauthenticated, async (req, res) => {
                                 c.id as category_id, c.name as category_name
                         FROM "transaction-history" as th
                         FULL JOIN "category" as c on th.category_id = c.id
-                        WHERE th.id IS NOT NULL AND th.user_id = 1 AND th.date = $1
+                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id} AND th.date = $1
                         ORDER BY th.date DESC;`;
+    const sqlQueryTwo = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
+                            JOIN "transaction-history" as th on c.id = th.category_id
+                            WHERE c.user_id = ${req.user.id} AND th.date = $1 GROUP BY c.id
+                            ORDER BY SUM DESC;`;
     
     try {
+        let responseToSend = { transactions: [], categories: [] }
+
         const response = await pool.query(sqlQuery, [`${dayToQuery}`]);
+        const responseTwo = await pool.query(sqlQueryTwo, [`${dayToQuery}`]);
+
+        responseToSend.transactions = response.rows;
+        responseToSend.categories = responseTwo.rows;
 
         console.log('Retrieved daily transactions successfully');
-        res.send(response.rows).status(200);
+        res.send(responseToSend).status(200);
     } catch (error) {
         console.log('Error in fetching daily transactions', error);
         res.sendStatus(500);

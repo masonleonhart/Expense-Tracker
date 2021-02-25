@@ -68,7 +68,7 @@ router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
 
 router.get('/transactions', rejectUnauthenticated, async (req, res) => {
     const dateToday = moment().format(`YYYY-MM-DD`);
-    const earlierDate = moment().subtract(1, 'month').format('YYYY-MM-DD');
+    const earlierDate = moment().subtract(1, 'year').format('YYYY-MM-DD');
 
     const sqlQueryOne = `SELECT * FROM "transaction-history" WHERE "user_id" = ${req.user.id} ORDER BY "date" DESC;`;
     const sqlQueryTwo = `INSERT INTO "transaction-history" ("income", "user_id", "name", "amount", "date", "transaction_id")

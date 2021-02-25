@@ -18,6 +18,15 @@ const currentDayReducer = (state = 0, action) => {
     };
 };
 
+const currentMonthReducer = (state = 0, action) => {
+    switch (action.type) {
+        case 'SET_MONTH':
+            return state + action.payload;
+        default:
+            return state;
+    };
+};
+
 const dailyExpenseReducer = (state = [], action) => {
     switch (action.type) {
         case 'SET_DAILY_EXPENSES':
@@ -75,5 +84,6 @@ export default combineReducers({
     newExpenseReducer,
     newIncomeReducer,
     currentDayReducer,
+    currentMonthReducer,
     dailyExpenseReducer,
 });

@@ -20,6 +20,15 @@ function* fetchDailyExpensesSaga(action) {
     };
 };
 
+function* fetchMonthlyExpensesSaga(action) {
+    try {
+        const response = yield axios.get(`/api/expense/monthly/${action.payload.currentDay}`);
+        yield console.log(response.data);
+    } catch (error) {
+        console.log('Error in fetching daily expenses', error);
+    };
+};
+
 function* addNewExpenseSaga(action) {
     try {
         yield axios.post('/api/expense/expense', action.payload);
@@ -65,6 +74,7 @@ function* deleteExpenseSaga(action) {
 function* expenseSaga() {
     yield takeLatest('FETCH_UNCATEGORIZED', fetchUncategorizedSaga);
     yield takeLatest('FETCH_DAILY_EXPENSES', fetchDailyExpensesSaga);
+    yield takeLatest('FETCH_MONTHLY_EXPENSES', fetchMonthlyExpensesSaga);
     yield takeLatest('ADD_NEW_EXPENSE', addNewExpenseSaga);
     yield takeLatest('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
     yield takeLatest('DELETE_EXPENSE', deleteExpenseSaga);

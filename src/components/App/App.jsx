@@ -19,6 +19,7 @@ import InfoPage from '../InfoPage/InfoPage';
 import LandingPage from '../LandingPage/LandingPage';
 import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
+import MonthPage from '../MonthPage/MonthPage';
 
 import './App.css';
 
@@ -64,6 +65,14 @@ function App() {
             path="/info"
           >
             <InfoPage />
+          </ProtectedRoute>
+
+          <ProtectedRoute
+            // logged in shows InfoPage else shows LoginPage
+            exact
+            path="/month"
+          >
+            <MonthPage />
           </ProtectedRoute>
 
           {/* When a value is supplied for the authRedirect prop the user will

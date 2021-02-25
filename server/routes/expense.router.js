@@ -86,6 +86,24 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     });
 });
 
+router.get('/monthly/:month', (req, res) => {
+    const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
+    const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
+    const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income, c.id as category_id, c.name as category_name
+                        FROM "transaction-history" as th
+                        FULL JOIN "category" as c on th.category_id = c.id
+                        WHERE th.id IS NOT NULL AND th.user_id = 1 
+                        AND th.date BETWEEN $1 AND $2 ORDER BY th.date DESC;`;
+
+    pool.query(sqlQuery, [`${startMonthToQuery}`, `${endMonthToQuery}`]).then(response => {
+        console.log('Retrieved monthly transactions successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in fetching monthly transactions', err);
+        res.sendStatus(500);
+    });
+});
+
 // PUT
 
 router.put('/unassigned/:id', rejectUnauthenticated, (req, res) => {

@@ -12,7 +12,8 @@ function* createLinkTokenSaga(action) {
 
 function* fetchPlaidTransactionsSaga() {
     try {
-        yield axios.get('/api/plaid/transactions')
+        const response = yield axios.get('/api/plaid/transactions');
+        yield console.log(response.data)
         yield put({ type: 'FETCH_UNCATEGORIZED' });
     } catch (error) {
         console.log('Error in fetching plaid transactions');

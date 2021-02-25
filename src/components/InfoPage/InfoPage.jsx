@@ -15,10 +15,12 @@ function InfoPage() {
 
   const handleClick = (incomingDay) => {
     dispatch({ type: 'FETCH_DAILY_EXPENSES', payload: { incomingDay, currentDay: currentDay + incomingDay } });
+    dispatch({ type: 'FETCH_DAILY_CATEGORIES', payload: currentDay + incomingDay });
   };
 
   useEffect(() => {
     dispatch({ type: 'FETCH_DAILY_EXPENSES', payload: { incomingDay: 0, currentDay } });
+    dispatch({ type: 'FETCH_DAILY_CATEGORIES', payload: currentDay});
   }, []);
 
   return (

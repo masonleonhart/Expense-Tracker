@@ -2,6 +2,7 @@ const express = require('express');
 const pool = require('../modules/pool');
 const router = express.Router();
 const { rejectUnauthenticated } = require('../modules/authentication-middleware');
+const moment = require('moment');
 
 // POST
 
@@ -36,6 +37,22 @@ router.get('/', rejectUnauthenticated, (req, res) => {
         res.send(result.rows).status(200);
     }).catch(err => {
         console.log('Error in getting categories', err);
+        res.sendStatus(500);
+    });
+});
+
+router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
+    const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
+    const sqlQueryTwo = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
+                            JOIN "transaction-history" as th on c.id = th.category_id
+                            WHERE c.user_id = ${req.user.id} AND th.date = $1 GROUP BY c.id
+                            ORDER BY SUM DESC;`;
+
+    pool.query(sqlQueryTwo, [`${dayToQuery}`]).then(response => {
+        console.log('Retrieved daily categories successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in getting daily categories', err);
         res.sendStatus(500);
     });
 });

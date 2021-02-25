@@ -68,7 +68,7 @@ router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
     });
 });
 
-router.get('/daily/:day', rejectUnauthenticated, async (req, res) => {
+router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income,
                                 c.id as category_id, c.name as category_name
@@ -76,26 +76,14 @@ router.get('/daily/:day', rejectUnauthenticated, async (req, res) => {
                         FULL JOIN "category" as c on th.category_id = c.id
                         WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id} AND th.date = $1
                         ORDER BY th.date DESC;`;
-    const sqlQueryTwo = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
-                            JOIN "transaction-history" as th on c.id = th.category_id
-                            WHERE c.user_id = ${req.user.id} AND th.date = $1 GROUP BY c.id
-                            ORDER BY SUM DESC;`;
-    
-    try {
-        let responseToSend = { transactions: [], categories: [] }
 
-        const response = await pool.query(sqlQuery, [`${dayToQuery}`]);
-        const responseTwo = await pool.query(sqlQueryTwo, [`${dayToQuery}`]);
-
-        responseToSend.transactions = response.rows;
-        responseToSend.categories = responseTwo.rows;
-
+    pool.query(sqlQuery, [`${dayToQuery}`]).then(response => {
         console.log('Retrieved daily transactions successfully');
-        res.send(responseToSend).status(200);
-    } catch (error) {
-        console.log('Error in fetching daily transactions', error);
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in fetching daily transactions', err);
         res.sendStatus(500);
-    };
+    });
 });
 
 // PUT

@@ -68,6 +68,19 @@ router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
     });
 });
 
+router.get('/subcategory/transactions/:name', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `SELECT * FROM "subcategory" WHERE "name" = '${req.params.name}' 
+                        AND "user_id" = ${req.user.id} ORDER BY DATE DESC;`;
+    
+    pool.query(sqlQuery).then(response => {
+        console.log('Retrieved subcategory transactions successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in fetching subcategory transactions', err);
+        res.sendStatus(500);
+    });
+});
+
 router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income,

@@ -27,7 +27,7 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 
 // GET
 
-router.get('/', rejectUnauthenticated, (req, res) => {
+router.get('/main', rejectUnauthenticated, (req, res) => {
     const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(th.amount), 0) FROM "category" as c
                             FULL JOIN "transaction-history" as th on c.id = th.category_id
                             WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
@@ -39,6 +39,20 @@ router.get('/', rejectUnauthenticated, (req, res) => {
         console.log('Error in getting categories', err);
         res.sendStatus(500);
     });
+});
+
+router.get('/sub', rejectUnauthenticated, (req, res) => {
+    const sqlQuery = `SELECT "name", COUNT("name") FROM "subcategory"
+                        WHERE "user_id" = ${req.user.id} GROUP BY "name" 
+                        ORDER BY COUNT DESC;`;
+    
+    pool.query(sqlQuery).then(response => {
+        console.log('Retrieved subcategories successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in getting subcategories', err);
+        res.sendStatus(500);
+    });;
 });
 
 router.get('/daily/:day', rejectUnauthenticated, (req, res) => {

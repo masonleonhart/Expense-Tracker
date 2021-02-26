@@ -4,6 +4,8 @@ import { PlaidLink } from 'react-plaid-link';
 import axios from 'axios';
 import moment from 'moment';
 
+import { Modal } from '@material-ui/core'
+
 import './UserPage.css'
 
 function UserPage() {
@@ -14,9 +16,10 @@ function UserPage() {
   const plaid = useSelector(store => store.plaid);
   const user = useSelector(store => store.user);
 
-  let [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
-  let [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
-  let [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
+  const [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
+  const [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
+  const [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
+  const [toggleModal, setToggleModal] = useState(false);
 
   const plaidLinkSuccess = React.useCallback(async public_token => {
     try {
@@ -50,6 +53,10 @@ function UserPage() {
     setToggleIncomeAddForm(false);
   };
 
+  const subRowClick = name => {
+    dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
+  };
+
   useEffect(() => {
     dispatch({ type: 'FETCH_LINK_TOKEN', payload: user.access_token });
     dispatch({ type: 'FETCH_CATEGORIES' });
@@ -76,44 +83,69 @@ function UserPage() {
           </PlaidLink>
         </>
       }
-      <h2>Categories</h2>
-      {toggleCategoryAddForm &&
-        <>
-          <h3>Add a Category</h3>
-          <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
-            <label htmlFor="category-name-input">Category Name</label>
-            <br />
-            <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
-            <br />
-            <br />
-            <button type='reset'>Cancel</button>
-            <button type='submit'>Save</button>
-          </form>
-        </>
-      }
-      {category.categoryReducer.length > 0 &&
-        <>
-          <table id='category-table'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Total Spent in Category</th>
-                <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
-              </tr>
-            </thead>
-            <tbody>
-              {category.categoryReducer.map(category =>
-                <tr key={category.id}>
-                  <td>{category.name}</td>
-                  <td>{toCurrency.format(category.coalesce)}</td>
-                  <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
+      <Modal
+        open={toggleModal}
+        onClose={() => setToggleModal(false)}
+      >
+        <p>Hello</p>
+      </Modal>
+      <div style={{ display: 'flex' }}>
+        <div>
+          <h2>Categories</h2>
+          {toggleCategoryAddForm &&
+            <>
+              <h3>Add a Category</h3>
+              <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
+                <label htmlFor="category-name-input">Category Name</label>
+                <br />
+                <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
+                <br />
+                <br />
+                <button type='reset'>Cancel</button>
+                <button type='submit'>Save</button>
+              </form>
+            </>
+          }
+          {category.categoryReducer.length > 0 &&
+            <table id='category-table'>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Total Spent in Category</th>
+                  <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
+                </tr>
+              </thead>
+              <tbody>
+                {category.categoryReducer.map(category =>
+                  <tr key={category.id}>
+                    <td>{category.name}</td>
+                    <td>{toCurrency.format(category.coalesce)}</td>
+                    <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
+                  </tr>)}
+              </tbody>
+            </table >
+          }
+        </div>
+        <div>
+          <h2>Subcategories</h2>
+          {category.subcategoryReducer.length > 0 &&
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Transactions in subcategory</th>
+                </tr>
+              </thead>
+              <tbody>
+                {category.subcategoryReducer.map(subcategory => <tr onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
+                  <td>{subcategory.name}</td>
+                  <td>{subcategory.count}</td>
                 </tr>)}
-            </tbody>
-          </table >
-          <br />
-          <br />
-        </>
-      }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
       <h2>Uncategorized Transactions</h2>
       <div id='expense-container'>
         {category.categoryReducer.length > 0 && expense.uncategorizedExpenseReducer.length > 0 ?

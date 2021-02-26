@@ -3,10 +3,19 @@ import { takeLatest, put } from 'redux-saga/effects';
 
 function* fetchCategorySaga() {
     try {
-        const response = yield axios.get('/api/category/');
-        yield put({ type: 'SET_CATEGORIES', payload: response.data });
+        const responseOne = yield axios.get('/api/category/main');
+        yield put({ type: 'SET_CATEGORIES', payload: responseOne.data });
     } catch (error) {
         console.log('Error in fetching categories', error);
+    };
+};
+
+function* fetchSubcategorySaga() {
+    try {
+        const responseTwo = yield axios.get('/api/category/sub');
+        yield put({ type: 'SET_SUBCATEGORIES', payload: responseTwo.data });
+    } catch (error) {
+        console.log('Error in fetching subcategories', error);
     };
 };
 
@@ -50,6 +59,7 @@ function* deleteCategorySaga(action) {
 
 function* categorySaga() {
     yield takeLatest('FETCH_CATEGORIES', fetchCategorySaga);
+    yield takeLatest('FETCH_SUBCATEGORIES', fetchSubcategorySaga);
     yield takeLatest('FETCH_DAILY_CATEGORIES', fetchDailyCategoriesSaga);
     yield takeLatest('FETCH_MONTHLY_CATEGORIES', fetchMonthlyCategoriesSaga);
     yield takeLatest('ADD_NEW_CATEGORY', addNewCategorySaga);

@@ -10,6 +10,15 @@ function* fetchUncategorizedSaga() {
     };
 };
 
+function* fetchSubcatTransactionsSaga(action) {
+    try {
+        const response = yield axios.get(`/api/expense/subcategory/transactions/${action.payload}`);
+        yield put({ type: 'SET_SUBCAT_TRANSACTIONS', payload: response.data });
+    } catch (error) {
+        console.log('Error in fetching subcategory transactions', error);
+    };
+};
+
 function* fetchDailyExpensesSaga(action) {
     try {
         yield put({ type: 'SET_DAY', payload: action.payload.incomingDay });
@@ -83,6 +92,7 @@ function* deleteExpenseSaga(action) {
 
 function* expenseSaga() {
     yield takeLatest('FETCH_UNCATEGORIZED', fetchUncategorizedSaga);
+    yield takeLatest('FETCH_SUBCAT_TRANSACTIONS', fetchSubcatTransactionsSaga);
     yield takeLatest('FETCH_DAILY_EXPENSES', fetchDailyExpensesSaga);
     yield takeLatest('FETCH_DAILY_SUMS', fetchDailySumsSaga);
     yield takeLatest('FETCH_MONTHLY_EXPENSES', fetchMonthlyExpensesSaga);

@@ -9,6 +9,15 @@ const uncategorizedExpenseReducer = (state = [], action) => {
     };
 };
 
+const subcategoryExpenseReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'SET_SUBCAT_TRANSACTIONS':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
 const currentDayReducer = (state = 0, action) => {
     switch (action.type) {
         case 'SET_DAY':
@@ -99,6 +108,7 @@ const newIncomeReducer = (state = { income: true, name: '', amount: '', date: ''
 
 export default combineReducers({
     uncategorizedExpenseReducer,
+    subcategoryExpenseReducer,
     newExpenseReducer,
     newIncomeReducer,
     currentDayReducer,

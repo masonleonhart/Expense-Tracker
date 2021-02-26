@@ -10,6 +10,7 @@ function MonthPage() {
     const dispatch = useDispatch();
     const currentMonth = useSelector(store => store.expense.currentMonthReducer);
     const expense = useSelector(store => store.expense);
+    const category = useSelector(store => store.category);
 
     const toCurrency = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -57,7 +58,7 @@ function MonthPage() {
             </Calendar>
             <br />
             <br />
-            {/* <table style={{ margin: 'auto' }}>
+            <table style={{ margin: 'auto' }}>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -65,7 +66,7 @@ function MonthPage() {
                     </tr>
                 </thead>
                 <tbody>
-                    {category.dailyCategoryReducer.map(category =>
+                    {category.monthlyCategoryReducer.map(category =>
                         <tr key={category.id}>
                             <td>{category.name}</td>
                             <td>{toCurrency.format(category.sum)}</td>
@@ -73,7 +74,7 @@ function MonthPage() {
                 </tbody>
             </table >
             <br />
-            <br /> */}
+            <br />
             <table style={{ margin: 'auto' }}>
                 <thead>
                     <tr>

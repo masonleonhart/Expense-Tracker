@@ -86,13 +86,29 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     });
 });
 
-router.get('/monthly/:month', (req, res) => {
+router.get('/monthly/dailysums/:month', rejectUnauthenticated, (req, res) => {
+    const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
+    const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
+    const sqlQuery = `SELECT "date", SUM("amount") FROM "transaction-history"
+                        WHERE "user_id" = ${req.user.id} AND "date" BETWEEN $1 AND $2
+                        GROUP BY "date" ORDER BY "date" ASC;`;
+
+    pool.query(sqlQuery, [`${startMonthToQuery}`, `${endMonthToQuery}`]).then(response => {
+        console.log('Retrieved daily sums successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in fetching daily sums', err);
+        res.sendStatus(500);
+    });
+});
+
+router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
     const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
     const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income, c.id as category_id, c.name as category_name
                         FROM "transaction-history" as th
                         FULL JOIN "category" as c on th.category_id = c.id
-                        WHERE th.id IS NOT NULL AND th.user_id = 1 
+                        WHERE th.id IS NOT NULL AND th.user_id = ${req.user.id} 
                         AND th.date BETWEEN $1 AND $2 ORDER BY th.date DESC;`;
 
     pool.query(sqlQuery, [`${startMonthToQuery}`, `${endMonthToQuery}`]).then(response => {

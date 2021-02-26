@@ -1,0 +1,43 @@
+.calendar-tile {
+    color: black;
+    min-height: 50px;
+}
+
+.react-calendar__navigation__label__labelText {
+    color: black;
+}
+
+.react-calendar {
+    width: 30%;
+}
+
+@media (max-width: 320px) {
+    .container {
+        padding: 5px !important;
+    }
+
+    .react-calendar {
+        width: 100%;
+    }
+
+    .calendar-tile {
+        font-size: 9px !important;
+        min-height: 30px;
+    }
+}
+
+.daily-sum-income {
+    color: green;
+}
+
+.daily-sum-expense {
+    color: red;
+}
+
+.nav-tile {
+    margin: 0px;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}

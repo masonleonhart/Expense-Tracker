@@ -36,6 +36,24 @@ const dailyExpenseReducer = (state = [], action) => {
     };
 };
 
+const dailySumsReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'SET_DAILY_SUMS':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
+const monthlyExpenseReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'SET_MONTHLY_EXPENSES':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
 const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date: '' }, action) => {
     let newState = { ...state };
 
@@ -86,4 +104,6 @@ export default combineReducers({
     currentDayReducer,
     currentMonthReducer,
     dailyExpenseReducer,
+    dailySumsReducer,
+    monthlyExpenseReducer,
 });

@@ -12,9 +12,9 @@ function* fetchUncategorizedSaga() {
 
 function* fetchDailyExpensesSaga(action) {
     try {
+        yield put({ type: 'SET_DAY', payload: action.payload.incomingDay });
         const response = yield axios.get(`/api/expense/daily/${action.payload.currentDay}`);
         yield put({ type: 'SET_DAILY_EXPENSES', payload: response.data });
-        yield put({ type: 'SET_DAY', payload: action.payload.incomingDay });
     } catch (error) {
         console.log('Error in fetching daily expenses', error);
     };
@@ -22,10 +22,20 @@ function* fetchDailyExpensesSaga(action) {
 
 function* fetchMonthlyExpensesSaga(action) {
     try {
-        const response = yield axios.get(`/api/expense/monthly/${action.payload.currentDay}`);
-        yield console.log(response.data);
+        const response = yield axios.get(`/api/expense/monthly/${action.payload.currentMonth}`);
+        yield put({ type: 'SET_MONTHLY_EXPENSES', payload: response.data });
     } catch (error) {
         console.log('Error in fetching daily expenses', error);
+    };
+};
+
+function* fetchDailySumsSaga(action) {
+    try {
+        yield put({ type: 'SET_MONTH', payload: action.payload.incomingMonth });
+        const response = yield axios.get(`/api/expense/monthly/dailysums/${action.payload.currentMonth}`);
+        yield put({ type: 'SET_DAILY_SUMS', payload: response.data });
+    } catch (error) {
+        console.log('Error in fetching daily sums', error);
     };
 };
 
@@ -74,6 +84,7 @@ function* deleteExpenseSaga(action) {
 function* expenseSaga() {
     yield takeLatest('FETCH_UNCATEGORIZED', fetchUncategorizedSaga);
     yield takeLatest('FETCH_DAILY_EXPENSES', fetchDailyExpensesSaga);
+    yield takeLatest('FETCH_DAILY_SUMS', fetchDailySumsSaga);
     yield takeLatest('FETCH_MONTHLY_EXPENSES', fetchMonthlyExpensesSaga);
     yield takeLatest('ADD_NEW_EXPENSE', addNewExpenseSaga);
     yield takeLatest('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);

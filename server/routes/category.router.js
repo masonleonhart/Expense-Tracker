@@ -57,6 +57,10 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     });
 });
 
+router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
+    console.log(req.params.month);
+});
+
 // DELETE 
 
 router.delete('/:id', rejectUnauthenticated, (req, res) => {

@@ -19,6 +19,15 @@ function* fetchDailyCategoriesSaga(action) {
     };
 };
 
+function* fetchMonthlyCategoriesSaga(action) {
+    try {
+        const response = yield axios.get(`api/category/monthly/${action.payload}`);
+        yield put({ type: 'SET_MONTHLY_CATEGORIES', payload: response.data });
+    } catch (error) {
+        console.log('Error in fetching monthly categories', error);
+    };
+};
+
 function* addNewCategorySaga(action) {
     try {
         yield axios.post('/api/category', action.payload);
@@ -42,6 +51,7 @@ function* deleteCategorySaga(action) {
 function* categorySaga() {
     yield takeLatest('FETCH_CATEGORIES', fetchCategorySaga);
     yield takeLatest('FETCH_DAILY_CATEGORIES', fetchDailyCategoriesSaga);
+    yield takeLatest('FETCH_MONTHLY_CATEGORIES', fetchMonthlyCategoriesSaga);
     yield takeLatest('ADD_NEW_CATEGORY', addNewCategorySaga);
     yield takeLatest('DELETE_CATEGORY', deleteCategorySaga);
 };

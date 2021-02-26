@@ -9,6 +9,7 @@
 
 .react-calendar {
     width: 30%;
+    margin: auto;
 }
 
 @media (max-width: 320px) {

@@ -31,27 +31,67 @@ function MonthPage() {
             return;
         } else {
             dispatch({ type: 'FETCH_DAILY_SUMS', payload: { incomingMonth, currentMonth: currentMonth + incomingMonth } });
+            dispatch({ type: 'FETCH_MONTHLY_EXPENSES', payload: currentMonth + incomingMonth });
+            dispatch({ type: 'FETCH_MONTHLY_CATEGORIES', payload: currentMonth + incomingMonth });
         };
     };
 
     useEffect(() => {
         dispatch({ type: 'FETCH_DAILY_SUMS', payload: { incomingMonth: 0, currentMonth } })
         dispatch({ type: 'FETCH_MONTHLY_EXPENSES', payload: { incomingMonth: 0, currentMonth } });
+        dispatch({ type: 'FETCH_MONTHLY_CATEGORIES', payload: currentMonth });
     }, []);
 
     return (
-        <div className='container' style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className='container'>
             <Calendar
                 calendarType='US'
                 tileContent={renderSum}
                 minDetail='month'
                 nextLabel={<p className='nav-tile' onClick={() => handleClick(1)}>›</p>}
-                prevLabel={<p className='nav-tile' onClick={({date}) => handleClick(-1, date)}>‹</p>}
+                prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
                 tileClassName='calendar-tile'
                 showNeighboringMonth={false}
                 maxDate={new Date(moment().endOf('month').format('YYYY-MM-DD'))}
             >
             </Calendar>
+            <br />
+            <br />
+            {/* <table style={{ margin: 'auto' }}>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Total Spent in Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {category.dailyCategoryReducer.map(category =>
+                        <tr key={category.id}>
+                            <td>{category.name}</td>
+                            <td>{toCurrency.format(category.sum)}</td>
+                        </tr>)}
+                </tbody>
+            </table >
+            <br />
+            <br /> */}
+            <table style={{ margin: 'auto' }}>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {expense.monthlyExpenseReducer.map(expense => <tr key={expense.id}>
+                        <td>{expense.name}</td>
+                        <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
+                        <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
+                        <td>{expense.category_name}</td>
+                    </tr>)}
+                </tbody>
+            </table>
         </div>
     );
 };

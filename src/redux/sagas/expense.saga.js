@@ -22,7 +22,7 @@ function* fetchDailyExpensesSaga(action) {
 
 function* fetchMonthlyExpensesSaga(action) {
     try {
-        const response = yield axios.get(`/api/expense/monthly/${action.payload.currentMonth}`);
+        const response = yield axios.get(`/api/expense/monthly/${action.payload}`);
         yield put({ type: 'SET_MONTHLY_EXPENSES', payload: response.data });
     } catch (error) {
         console.log('Error in fetching daily expenses', error);

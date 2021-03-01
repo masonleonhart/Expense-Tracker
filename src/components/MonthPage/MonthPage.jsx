@@ -39,7 +39,7 @@ function MonthPage() {
 
     useEffect(() => {
         dispatch({ type: 'FETCH_DAILY_SUMS', payload: { incomingMonth: 0, currentMonth } })
-        dispatch({ type: 'FETCH_MONTHLY_EXPENSES', payload: { incomingMonth: 0, currentMonth } });
+        dispatch({ type: 'FETCH_MONTHLY_EXPENSES', payload: currentMonth });
         dispatch({ type: 'FETCH_MONTHLY_CATEGORIES', payload: currentMonth });
     }, []);
 
@@ -54,6 +54,11 @@ function MonthPage() {
                 tileClassName='calendar-tile'
                 showNeighboringMonth={false}
                 maxDate={new Date(moment().endOf('month').format('YYYY-MM-DD'))}
+                defaultActiveStartDate={new Date(
+                    (Number(moment().add(currentMonth, 'months').format('YYYY'))),
+                    (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
+                    (Number(moment().add(currentMonth, 'months').format('DD'))),
+                )}
             >
             </Calendar>
             <br />

@@ -94,8 +94,8 @@ function UserPage() {
         open={toggleModal}
         onClose={() => setToggleModal(false)}
       >
-        {expense.subcategoryExpenseReducer > 0 && <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
-          <h2>Expenses in {expense.subcategoryExpenseReducer[0].name}</h2>
+        <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
+          <h2>Expenses in {expense.subcatViewNameReducer}</h2>
           <br />
           <table style={{ margin: 'auto' }}>
             <thead>
@@ -126,7 +126,7 @@ function UserPage() {
           <button onClick={() => setToggleModal(false)}>OK</button>
           <br />
           <br />
-        </div>}
+        </div>
       </Modal>
       <div style={{ display: 'flex' }}>
         <div>
@@ -145,80 +145,74 @@ function UserPage() {
               </form>
             </>
           }
-          {category.categoryReducer.length > 0 &&
-            <table id='category-table'>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Total Spent in Category</th>
-                  <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
-                </tr>
-              </thead>
-              <tbody>
-                {category.categoryReducer.map(category =>
-                  <tr key={category.id}>
-                    <td>{category.name}</td>
-                    <td>{toCurrency.format(category.coalesce)}</td>
-                    <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
-                  </tr>)}
-              </tbody>
-            </table >
-          }
+          <table id='category-table'>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Total Spent in Category</th>
+                <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
+              </tr>
+            </thead>
+            {category.categoryReducer.length > 0 && <tbody>
+              {category.categoryReducer.map(category =>
+                <tr key={category.id}>
+                  <td>{category.name}</td>
+                  <td>{toCurrency.format(category.coalesce)}</td>
+                  <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
+                </tr>)}
+            </tbody>}
+          </table >
         </div>
         <div>
           <h2>Subcategories</h2>
-          {category.subcategoryReducer.length > 0 &&
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Transactions in subcategory</th>
-                </tr>
-              </thead>
-              <tbody>
-                {category.subcategoryReducer.map(subcategory => <tr onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
-                  <td>{subcategory.name}</td>
-                  <td>{subcategory.count}</td>
-                </tr>)}
-              </tbody>
-            </table>
-          }
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Transactions in subcategory</th>
+              </tr>
+            </thead>
+            {category.subcategoryReducer.length > 0 && <tbody>
+              {category.subcategoryReducer.map(subcategory => <tr className='subcategory-row' onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
+                <td>{subcategory.name}</td>
+                <td>{subcategory.count}</td>
+              </tr>)}
+            </tbody>}
+          </table>
         </div>
       </div>
       <h2>Uncategorized Transactions</h2>
       <div id='expense-container'>
-        {category.categoryReducer.length > 0 && expense.uncategorizedExpenseReducer.length > 0 ?
-          <table id='expense-table'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Category</th>
-                <th>
-                  <button onClick={() => !toggleExpenseAddForm ? setToggleExpenseAddForm(true) : setToggleExpenseAddForm(false)}>Add Expense</button>
-                  <button onClick={() => !toggleIncomeAddForm ? setToggleIncomeAddForm(true) : setToggleIncomeAddForm(false)}>Add Income</button>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {expense.uncategorizedExpenseReducer.map(expense => <tr key={expense.id}>
-                <td>{expense.name}</td>
-                <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-                <td>
-                  {expense.category_id === null && expense.income === true ? <></>
-                    : expense.category_id === null ?
-                      <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
-                        <option value="0">Select a Category</option>
-                        {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
-                      </select> : expense.category_name
-                  }
-                </td>
-                <td>{!expense.transaction_id && <button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Item</button>}</td>
-              </tr>)}
-            </tbody>
-          </table> : <></>}
+        <table id='expense-table'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Category</th>
+              <th>
+                <button onClick={() => !toggleExpenseAddForm ? setToggleExpenseAddForm(true) : setToggleExpenseAddForm(false)}>Add Expense</button>
+                <button onClick={() => !toggleIncomeAddForm ? setToggleIncomeAddForm(true) : setToggleIncomeAddForm(false)}>Add Income</button>
+              </th>
+            </tr>
+          </thead>
+          {expense.uncategorizedExpenseReducer.length > 0 && <tbody>
+            {expense.uncategorizedExpenseReducer.map(expense => <tr key={expense.id}>
+              <td>{expense.name}</td>
+              <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
+              <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
+              <td>
+                {expense.category_id === null &&
+                  <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
+                    <option value="0">Select a Category</option>
+                    {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
+                  </select>
+                }
+              </td>
+              <td>{!expense.transaction_id && <button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Item</button>}</td>
+            </tr>)}
+          </tbody>}
+        </table>
         {toggleExpenseAddForm &&
           <div>
             <h3>Add an Expense</h3>

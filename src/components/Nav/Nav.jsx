@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 function Nav() {
   const user = useSelector((store) => store.user);
-
+  
   let loginLinkData = {
     path: '/login',
     text: 'Login / Register',

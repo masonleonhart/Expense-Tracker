@@ -13,3 +13,7 @@ table {
 .expense-amount {
     background-color: rgba(255, 0, 0, 0.404);
 }
+
+.subcategory-row {
+    cursor: pointer;
+}

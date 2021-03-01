@@ -9,6 +9,15 @@ const uncategorizedExpenseReducer = (state = [], action) => {
     };
 };
 
+const subcatViewNameReducer = (state = '', action) => {
+    switch (action.type) {
+        case 'SET_SUBCAT_VIEW_NAME':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
 const subcategoryExpenseReducer = (state = [], action) => {
     switch (action.type) {
         case 'SET_SUBCAT_TRANSACTIONS':
@@ -31,6 +40,8 @@ const currentMonthReducer = (state = 0, action) => {
     switch (action.type) {
         case 'SET_MONTH':
             return state + action.payload;
+        case 'RESET_MONTH':
+            return 0;
         default:
             return state;
     };
@@ -108,6 +119,7 @@ const newIncomeReducer = (state = { income: true, name: '', amount: '', date: ''
 
 export default combineReducers({
     uncategorizedExpenseReducer,
+    subcatViewNameReducer,
     subcategoryExpenseReducer,
     newExpenseReducer,
     newIncomeReducer,

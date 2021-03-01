@@ -12,6 +12,7 @@ function* fetchUncategorizedSaga() {
 
 function* fetchSubcatTransactionsSaga(action) {
     try {
+        yield put({ type: 'SET_SUBCAT_VIEW_NAME', payload: action.payload });
         const response = yield axios.get(`/api/expense/subcategory/transactions/${action.payload}`);
         yield put({ type: 'SET_SUBCAT_TRANSACTIONS', payload: response.data });
     } catch (error) {

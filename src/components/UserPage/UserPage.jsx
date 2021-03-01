@@ -55,6 +55,7 @@ function UserPage() {
 
   const subRowClick = name => {
     dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
+    setToggleModal(true);
   };
 
   useEffect(() => {
@@ -84,10 +85,48 @@ function UserPage() {
         </>
       }
       <Modal
+        style={{
+          width: '50%',
+          margin: 'auto',
+          height: '100%',
+          top: '20%'
+        }}
         open={toggleModal}
         onClose={() => setToggleModal(false)}
       >
-        <p>Hello</p>
+        {expense.subcategoryExpenseReducer > 0 && <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
+          <h2>Expenses in {expense.subcategoryExpenseReducer[0].name}</h2>
+          <br />
+          <table style={{ margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
+                for (const expense of expense.uncategorizedExpenseReducer) {
+                  if (expense.transaction_id === subcategoryExpense.transaction_id) {
+                    return (
+                      <tr key={expense.id}>
+                        <td>{expense.name}</td>
+                        <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
+                        <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
+                      </tr>
+                    );
+                  };
+                };
+              })}
+            </tbody>
+          </table>
+          <br />
+          <br />
+          <button onClick={() => setToggleModal(false)}>OK</button>
+          <br />
+          <br />
+        </div>}
       </Modal>
       <div style={{ display: 'flex' }}>
         <div>

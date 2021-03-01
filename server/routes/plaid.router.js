@@ -81,6 +81,7 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
     try {
         const queryResponseOne = await pool.query(sqlQueryOne);
         const plaidResponse = await client.getTransactions(req.user.access_token, earlierDate, dateToday);
+        console.log(plaidResponse)
 
         for (const newTransaction of plaidResponse.transactions) {
             if (!queryResponseOne.rows.some(oldTransaction => oldTransaction.transaction_id === newTransaction.transaction_id)) {

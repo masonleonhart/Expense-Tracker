@@ -37,8 +37,6 @@ router.post('/income', rejectUnauthenticated, (req, res) => {
         return;
     };
 
-    console.log(req.body);
-
     pool.query(sqlQuery, [`${req.body.name}`, Number(-req.body.amount), `${req.body.date}`]).then(() => {
         console.log('Added new income successfully');
         res.sendStatus(201);

@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 const categoryReducer = (state = [], action) => {
+    // manages list of categories
     switch (action.type) {
         case 'SET_CATEGORIES':
             return action.payload;
@@ -10,6 +11,7 @@ const categoryReducer = (state = [], action) => {
 };
 
 const subcategoryReducer = (state = [], action) => {
+    // manages list of subcategories (categories from plaid transactions)
     switch (action.type) {
         case 'SET_SUBCATEGORIES':
             return action.payload;
@@ -19,6 +21,7 @@ const subcategoryReducer = (state = [], action) => {
 };
 
 const dailyCategoryReducer = (state = [], action) => {
+    // manages list of categories for specififed day
     switch (action.type) {
         case 'SET_DAILY_CATEGORIES':
             return action.payload;
@@ -28,6 +31,7 @@ const dailyCategoryReducer = (state = [], action) => {
 };
 
 const monthlyCategoryReducer = (state = [], action) => {
+    // manages list of categories for specified month
     switch (action.type) {
         case 'SET_MONTHLY_CATEGORIES':
             return action.payload;
@@ -37,6 +41,7 @@ const monthlyCategoryReducer = (state = [], action) => {
 };
 
 const newCategoryReducer = (state = { name: '' }, action) => {
+    // manages value for new category input
     let newState = { ...state };
 
     switch (action.type) {
@@ -47,7 +52,7 @@ const newCategoryReducer = (state = { name: '' }, action) => {
             return state = { name: '' };
         default:
             return state;
-    }
+    };
 };
 
 export default combineReducers({

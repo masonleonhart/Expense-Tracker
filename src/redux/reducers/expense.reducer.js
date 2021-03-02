@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 const uncategorizedExpenseReducer = (state = [], action) => {
+    // manages list of uncategorized transactions
     switch (action.type) {
         case 'SET_UNCATEGORIZED':
             return action.payload;
@@ -10,6 +11,7 @@ const uncategorizedExpenseReducer = (state = [], action) => {
 };
 
 const subcatViewNameReducer = (state = '', action) => {
+    // manages subcategory name of list of transactions in modal
     switch (action.type) {
         case 'SET_SUBCAT_VIEW_NAME':
             return action.payload;
@@ -19,6 +21,7 @@ const subcatViewNameReducer = (state = '', action) => {
 };
 
 const subcategoryExpenseReducer = (state = [], action) => {
+    // manages list of subcategory expenses
     switch (action.type) {
         case 'SET_SUBCAT_TRANSACTIONS':
             return action.payload;
@@ -28,6 +31,7 @@ const subcategoryExpenseReducer = (state = [], action) => {
 };
 
 const currentDayReducer = (state = 0, action) => {
+    // manages the current day 0 = today
     switch (action.type) {
         case 'SET_DAY':
             return state + action.payload;
@@ -39,6 +43,7 @@ const currentDayReducer = (state = 0, action) => {
 };
 
 const currentMonthReducer = (state = 0, action) => {
+    // manages current month 0 = this month
     switch (action.type) {
         case 'SET_MONTH':
             return state + action.payload;
@@ -50,6 +55,7 @@ const currentMonthReducer = (state = 0, action) => {
 };
 
 const dailyExpenseReducer = (state = [], action) => {
+    // manages list of expenses for specified day
     switch (action.type) {
         case 'SET_DAILY_EXPENSES':
             return action.payload;
@@ -59,6 +65,7 @@ const dailyExpenseReducer = (state = [], action) => {
 };
 
 const dailySumsReducer = (state = [], action) => {
+    // manages list of daily sums for the month view
     switch (action.type) {
         case 'SET_DAILY_SUMS':
             return action.payload;
@@ -68,6 +75,7 @@ const dailySumsReducer = (state = [], action) => {
 };
 
 const monthlyExpenseReducer = (state = [], action) => {
+    // manages list of expenses for specified month
     switch (action.type) {
         case 'SET_MONTHLY_EXPENSES':
             return action.payload;
@@ -77,6 +85,7 @@ const monthlyExpenseReducer = (state = [], action) => {
 };
 
 const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date: '' }, action) => {
+    // manages values for the new expenses inputs
     let newState = { ...state };
 
     switch (action.type) {
@@ -100,6 +109,7 @@ const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date:
 };
 
 const newIncomeReducer = (state = { income: true, name: '', amount: '', date: '' }, action) => {
+    // manages values for the new income inputs
     let newState = { ...state };
 
     switch (action.type) {

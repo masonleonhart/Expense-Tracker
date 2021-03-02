@@ -10,7 +10,7 @@ import './MonthPage.css'
 function MonthPage() {
     const dispatch = useDispatch();
     const history = useHistory();
-    const currentMonth = useSelector(store => store.expense.currentMonthReducer);
+    const currentMonth = useSelector(store => store.expense.currentMonthReducer); // Accesses the current month that is stored inside of the expense reducer
     const expense = useSelector(store => store.expense);
     const category = useSelector(store => store.category);
 

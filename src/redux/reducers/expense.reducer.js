@@ -42,8 +42,8 @@ const currentMonthReducer = (state = 0, action) => {
     switch (action.type) {
         case 'SET_MONTH':
             return state + action.payload;
-        case 'RESET_MONTH':
-            return 0;
+        case 'GO_TO_MONTH':
+            return action.payload;
         default:
             return state;
     };

@@ -68,7 +68,7 @@ function App() {
           </ProtectedRoute>
 
           <ProtectedRoute
-            // logged in shows InfoPage else shows LoginPage
+            // logged in shows MonthPage else shows LoginPage
             exact
             path="/month"
           >

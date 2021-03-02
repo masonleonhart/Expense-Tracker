@@ -7,6 +7,8 @@ const moment = require('moment');
 // POST
 
 router.post('/expense', rejectUnauthenticated, (req, res) => {
+    // Adds a client created expense to the database
+
     const sqlQuery = `INSERT INTO "transaction-history" ("user_id", "category_id", "name", "amount", "date")
                         VALUES (${req.user.id}, $1, $2, $3, $4);`;
 
@@ -28,6 +30,8 @@ router.post('/expense', rejectUnauthenticated, (req, res) => {
 });
 
 router.post('/income', rejectUnauthenticated, (req, res) => {
+    // Adds a client created income to the database
+
     const sqlQuery = `INSERT INTO "transaction-history" ("user_id", "income", "name", "amount", "date")
                         VALUES (${req.user.id}, ${req.body.income}, $1, $2, $3);`;
 
@@ -49,6 +53,8 @@ router.post('/income', rejectUnauthenticated, (req, res) => {
 // GET
 
 router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
+    // Grabs all uncategorized transactions from the database
+
     const sqlQuery = `SELECT th.id, th.name, th.amount, th.date, th.transaction_id, th.income, 
                                 c.id as category_id, c.name as category_name
                         FROM "transaction-history" as th
@@ -67,6 +73,9 @@ router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/subcategory/transactions/:name', rejectUnauthenticated, (req, res) => {
+    // Grabs all plaid transactions associated to a specified subcategory (categories associated to the 
+    // transactions pulled from plaid) from the database
+
     const sqlQuery = `SELECT * FROM "subcategory" WHERE "name" = '${req.params.name}' 
                         AND "user_id" = ${req.user.id} ORDER BY DATE DESC;`;
     
@@ -80,6 +89,8 @@ router.get('/subcategory/transactions/:name', rejectUnauthenticated, (req, res) 
 });
 
 router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
+    // Grabs all transactions from the database associated to the day that is specified from the client
+
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income,
                                 c.id as category_id, c.name as category_name
@@ -98,6 +109,8 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/monthly/dailysums/:month', rejectUnauthenticated, (req, res) => {
+    // Grabs all daily sums from the database over the month that is specified from the database
+
     const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
     const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
     const sqlQuery = `SELECT "date", SUM("amount") FROM "transaction-history"
@@ -114,6 +127,8 @@ router.get('/monthly/dailysums/:month', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
+    // Grabs all transactions from the database over the month that is specified from the database
+
     const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
     const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
     const sqlQuery = `SELECT th.id, th.name, th.amount, th. date, th.transaction_id, th.income, c.id as category_id, c.name as category_name
@@ -134,6 +149,8 @@ router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
 // PUT
 
 router.put('/unassigned/:id', rejectUnauthenticated, (req, res) => {
+    // Updates the category to a client created category of an uncategorized transactions
+    
     const sqlQuery = `UPDATE "transaction-history" SET "category_id" = ${req.body.category_id}
                         WHERE id = ${req.params.id};`;
 
@@ -149,6 +166,8 @@ router.put('/unassigned/:id', rejectUnauthenticated, (req, res) => {
 // DELETE 
 
 router.delete(`/:id`, rejectUnauthenticated, (req, res) => {
+    // Deletes a client created transaction
+
     const sqlQuery = `DELETE FROM "transaction-history" WHERE "id" = ${req.params.id};`;
 
     pool.query(sqlQuery).then(() => {

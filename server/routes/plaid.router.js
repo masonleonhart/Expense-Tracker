@@ -6,6 +6,8 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 const moment = require('moment');
 
 const client = new plaid.Client({
+    // Creates the plaid client required to access the plaid api
+
     clientID: process.env.PLAID_CLIENT_ID,
     secret: process.env.PLAID_SECRET,
     env: plaid.environments[process.env.PLAID_ENV]
@@ -14,13 +16,17 @@ const client = new plaid.Client({
 // POST
 
 router.post('/link_token', rejectUnauthenticated, async (req, res) => {
+    // Creates a link token for the plaid api ( if there is an access token sent over from the client
+    // then the function creates a new link without creating a new public key ( if there was an error
+    // in the user's credentials and they need to refresh their login ) )
+
     try {
         if (req.body.access_token) {
             const tokenResponse = await client.createLinkToken({
                 user: {
                     client_user_id: `${req.user.id}`
                 },
-                client_name: 'solo spike',
+                client_name: 'Expense Tracker',
                 country_codes: ['US'],
                 language: 'en',
                 access_token: req.body.access_token
@@ -49,6 +55,8 @@ router.post('/link_token', rejectUnauthenticated, async (req, res) => {
 });
 
 router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
+    // Exchanges the public token that was sent over from the client for an access token
+
     const PUBLIC_TOKEN = req.body.public_token;
     const sqlQuery = `UPDATE "user" SET "access_token" = $1 WHERE ID = ${req.user.id};`;
 
@@ -67,6 +75,14 @@ router.post('/exchange_token', rejectUnauthenticated, async (req, res) => {
 // GET
 
 router.get('/transactions', rejectUnauthenticated, async (req, res) => {
+    // Gets all transactions that are already in the database. Compares the transactions to the new
+    // transactions incoming from plaid by the transaction id. If the transaction already appears in the
+    // database, then skip to the next one, else, check if the transaction is an expense or an income.
+    // If the transaction is an income, insert into the transaction database with the constraint of TRUE 
+    // in the income column. If the transaction is an expense, insert into the transaction database normally
+    // and check for categories. Loop over the categories array of the transaction and insert each category 
+    // into the subcategory database with the transaction id associated to that category.
+
     const dateToday = moment().format(`YYYY-MM-DD`);
     const earlierDate = moment().subtract(1, 'year').format('YYYY-MM-DD');
 
@@ -104,6 +120,8 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
 });
 
 router.post('/sandbox/reset_login', (req, res) => {
+    // a sandbox endpoint to reset the login of the current user so they have to re-enter their credentials
+
     try {
         client.resetLogin(req.body.access_token).then(() => {
             console.log('Reset login successfully');

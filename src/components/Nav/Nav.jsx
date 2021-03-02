@@ -29,8 +29,8 @@ function Nav() {
 
         {user.id && (
           <>
-            <Link className="navLink" to="/info">
-              Info Page
+            <Link className="navLink" to="/day">
+              Day Page
             </Link>
             <Link className="navLink" to="/month">
               Month Page
@@ -38,10 +38,6 @@ function Nav() {
             <LogOutButton className="navLink" />
           </>
         )}
-
-        <Link className="navLink" to="/about">
-          About
-        </Link>
       </div>
     </div>
   );

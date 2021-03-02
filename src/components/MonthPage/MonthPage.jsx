@@ -63,7 +63,7 @@ function MonthPage() {
                 prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
                 tileClassName='calendar-tile'
                 showNeighboringMonth={false}
-                maxDate={new Date(moment().endOf('month').format('YYYY-MM-DD'))}
+                maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
                 defaultActiveStartDate={new Date(
                     (Number(moment().add(currentMonth, 'months').format('YYYY'))),
                     (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
@@ -77,7 +77,7 @@ function MonthPage() {
                     let difference = clickedDay.diff(currentDay, 'days')
 
                     dispatch({ type: 'GO_TO_DAY', payload: difference });
-                    history.push('/info');
+                    history.push('/day');
                 }}
             >
             </Calendar>

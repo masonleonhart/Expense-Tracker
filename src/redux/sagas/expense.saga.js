@@ -2,6 +2,7 @@ import axios from 'axios';
 import { takeLatest, put } from 'redux-saga/effects';
 
 function* fetchUncategorizedSaga() {
+    // fetches all uncategorized transactions and sends them to the uncategorized transactions reducer
     try {
         const response = yield axios.get('/api/expense/uncategorized');
         yield put({ type: 'SET_UNCATEGORIZED', payload: response.data });
@@ -11,6 +12,8 @@ function* fetchUncategorizedSaga() {
 };
 
 function* fetchSubcatTransactionsSaga(action) {
+    // sets the subcategory view name for the modal, fetches all transactions in that subcategory and sends them to the 
+    // subcategory transaction reducer
     try {
         yield put({ type: 'SET_SUBCAT_VIEW_NAME', payload: action.payload });
         const response = yield axios.get(`/api/expense/subcategory/transactions/${action.payload}`);
@@ -22,6 +25,8 @@ function* fetchSubcatTransactionsSaga(action) {
 
 function* fetchDailyExpensesSaga(action) {
     try {
+        // sets the current day and fetches all expenses for that day, fetches all transactions for that day and sends
+        // them to the daily expenses reducer
         yield put({ type: 'SET_DAY', payload: action.payload.incomingDay });
         const response = yield axios.get(`/api/expense/daily/${action.payload.currentDay}`);
         yield put({ type: 'SET_DAILY_EXPENSES', payload: response.data });
@@ -32,6 +37,7 @@ function* fetchDailyExpensesSaga(action) {
 
 function* fetchMonthlyExpensesSaga(action) {
     try {
+        // fetches all monthly transactions and sends them to the monthlly expenses reducer
         const response = yield axios.get(`/api/expense/monthly/${action.payload}`);
         yield put({ type: 'SET_MONTHLY_EXPENSES', payload: response.data });
     } catch (error) {
@@ -41,6 +47,8 @@ function* fetchMonthlyExpensesSaga(action) {
 
 function* fetchDailySumsSaga(action) {
     try {
+        // sets the current month and fetches all of the daily sums for the calendar, then sends the daily sums
+        // to the daily sums reducer
         yield put({ type: 'SET_MONTH', payload: action.payload.incomingMonth });
         const response = yield axios.get(`/api/expense/monthly/dailysums/${action.payload.currentMonth}`);
         yield put({ type: 'SET_DAILY_SUMS', payload: response.data });
@@ -51,6 +59,8 @@ function* fetchDailySumsSaga(action) {
 
 function* addNewExpenseSaga(action) {
     try {
+        // adds a new expense to the db and refreshes the categories and uncategorized transactions lists, then
+        // resets the values for the new expense form
         yield axios.post('/api/expense/expense', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
         yield put({ type: 'FETCH_UNCATEGORIZED' });
@@ -62,6 +72,8 @@ function* addNewExpenseSaga(action) {
 
 function* addNewIncomeSaga(action) {
     try {
+        // adds a new income to the db and refreshes the categories and uncategorized transactions lists, then
+        // resets the values for the new income form
         yield axios.post('/api/expense/income', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
         yield put({ type: 'FETCH_UNCATEGORIZED' });
@@ -72,6 +84,7 @@ function* addNewIncomeSaga(action) {
 };
 
 function* updateExpenseCategorySaga(action) {
+    // assigns a category to the an uncategorized transaction and refreshes the category and uncategorized transaction lists
     try {
         yield axios.put(`/api/expense/unassigned/${action.payload.expense_id}`, { category_id: action.payload.category_id });
         yield put({ type: 'FETCH_CATEGORIES' });
@@ -82,6 +95,7 @@ function* updateExpenseCategorySaga(action) {
 };
 
 function* deleteExpenseSaga(action) {
+    // deletes an expense from the database and refreshes the category and uncategorized transaction lists
     try {
         yield axios.delete(`/api/expense/${action.payload}`);
         yield put({ type: 'FETCH_CATEGORIES' });

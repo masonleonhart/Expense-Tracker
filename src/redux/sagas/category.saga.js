@@ -2,6 +2,7 @@ import axios from 'axios';
 import { takeLatest, put } from 'redux-saga/effects';
 
 function* fetchCategorySaga() {
+    // fetches all client created categories from db and sends them to category reducer
     try {
         const responseOne = yield axios.get('/api/category/main');
         yield put({ type: 'SET_CATEGORIES', payload: responseOne.data });
@@ -11,6 +12,7 @@ function* fetchCategorySaga() {
 };
 
 function* fetchSubcategorySaga() {
+    // fetches all plaid created categorie from db and sends them to the subcategory reducer
     try {
         const responseTwo = yield axios.get('/api/category/sub');
         yield put({ type: 'SET_SUBCATEGORIES', payload: responseTwo.data });
@@ -20,6 +22,7 @@ function* fetchSubcategorySaga() {
 };
 
 function* fetchDailyCategoriesSaga(action) {
+    // fetches all of the categories in the specified day and sends them to the daily categories reducer
     try {
         const response = yield axios.get(`/api/category/daily/${action.payload}`);
         yield put({ type: 'SET_DAILY_CATEGORIES', payload: response.data });
@@ -29,6 +32,7 @@ function* fetchDailyCategoriesSaga(action) {
 };
 
 function* fetchMonthlyCategoriesSaga(action) {
+    // fetches all of the categories in the specified month and sends them to the monthly category reducer
     try {
         const response = yield axios.get(`api/category/monthly/${action.payload}`);
         yield put({ type: 'SET_MONTHLY_CATEGORIES', payload: response.data });
@@ -38,6 +42,7 @@ function* fetchMonthlyCategoriesSaga(action) {
 };
 
 function* addNewCategorySaga(action) {
+    // posts a new category to the db and refreshes list of categories, then resets the values of the add category input
     try {
         yield axios.post('/api/category', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
@@ -48,6 +53,7 @@ function* addNewCategorySaga(action) {
 };
 
 function* deleteCategorySaga(action) {
+    // deletes specified category and refreshes list of categories and list of uncategorized transactions
     try {
         yield axios.delete(`/api/category/${action.payload}`);
         yield put({ type: 'FETCH_CATEGORIES' });

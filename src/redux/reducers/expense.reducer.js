@@ -31,6 +31,8 @@ const currentDayReducer = (state = 0, action) => {
     switch (action.type) {
         case 'SET_DAY':
             return state + action.payload;
+        case 'GO_TO_DAY':
+            return action.payload;
         default:
             return state;
     };

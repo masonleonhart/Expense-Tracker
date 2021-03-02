@@ -7,6 +7,8 @@ const moment = require('moment');
 // POST
 
 router.post('/', rejectUnauthenticated, (req, res) => {
+    // Inserts a client created category into the category database
+
     const sqlQuery = `INSERT INTO "category" ("user_id", "name")
                         VALUES (${req.user.id}, $1);`;
 
@@ -28,6 +30,8 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 // GET
 
 router.get('/main', rejectUnauthenticated, (req, res) => {
+    // Gets all client created categoreis from the database
+
     const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(th.amount), 0) FROM "category" as c
                             FULL JOIN "transaction-history" as th on c.id = th.category_id
                             WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
@@ -42,6 +46,8 @@ router.get('/main', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/sub', rejectUnauthenticated, (req, res) => {
+    // Gets all subcategories (categories associated to the transactions pulled from plaid) from the database
+
     const sqlQuery = `SELECT "name", COUNT("name") FROM "subcategory"
                         WHERE "user_id" = ${req.user.id} GROUP BY "name" 
                         ORDER BY COUNT DESC;`;
@@ -56,6 +62,8 @@ router.get('/sub', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
+    // Gets all client created categories associated to the day sent over from the client
+
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
     const sqlQueryTwo = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
                             JOIN "transaction-history" as th on c.id = th.category_id
@@ -72,6 +80,8 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
 });
 
 router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
+    // Gets all client created categories over the month that is sent over from the client
+
     const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
     const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
     const sqlQuery = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
@@ -91,6 +101,8 @@ router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
 // DELETE 
 
 router.delete('/:id', rejectUnauthenticated, (req, res) => {
+    // Deletes a client created category
+
     const sqlQuery = `DELETE FROM "category" WHERE "id" = ${req.params.id};`;
 
     pool.query(sqlQuery).then(() => {

@@ -2,12 +2,14 @@ import Calendar from 'react-calendar';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import 'react-calendar/dist/Calendar.css';
 import './MonthPage.css'
 
 function MonthPage() {
     const dispatch = useDispatch();
+    const history = useHistory();
     const currentMonth = useSelector(store => store.expense.currentMonthReducer);
     const expense = useSelector(store => store.expense);
     const category = useSelector(store => store.category);
@@ -59,6 +61,14 @@ function MonthPage() {
                     (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
                     (Number(moment().add(currentMonth, 'months').format('DD'))),
                 )}
+                onClickDay={(value) => {
+                    let clickedDay = moment(value).startOf('day');
+                    let currentDay = moment().startOf('day');
+                    let difference = clickedDay.diff(currentDay, 'days')
+
+                    dispatch({ type: 'GO_TO_DAY', payload: difference });
+                    history.push('/info');
+                }}
             >
             </Calendar>
             <br />

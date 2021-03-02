@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 const linkToken = (state = '', action) => {
+    // manages link token for current client
     switch (action.type) {
         case 'SET_LINK_TOKEN':
             return action.payload;
@@ -10,6 +11,7 @@ const linkToken = (state = '', action) => {
 };
 
 const plaidError = (state = false, action) => {
+    // manages state for plaid error
     switch (action.type) {
         case 'SET_PLAID_ERROR_TRUE':
             return true;

@@ -9,7 +9,6 @@ import { Modal } from '@material-ui/core'
 import './UserPage.css'
 
 function UserPage() {
-  // this component doesn't do much to start, just renders some user reducer info to the DOM
   const dispatch = useDispatch();
   const expense = useSelector(store => store.expense);
   const category = useSelector(store => store.category);
@@ -22,6 +21,9 @@ function UserPage() {
   const [toggleModal, setToggleModal] = useState(false);
 
   const plaidLinkSuccess = React.useCallback(async public_token => {
+    // An on success function for the plaid link, when a successful link is created, wait 3 seconds and
+    // fetch the user again so the access token appears in state
+
     try {
       await axios.post('/api/plaid/exchange_token', { public_token });
       setTimeout(() => dispatch({ type: 'FETCH_USER' }), 3000);
@@ -31,29 +33,43 @@ function UserPage() {
   });
 
   const toCurrency = new Intl.NumberFormat('en-US', {
+    // Converts a number to US currency format
+
     style: 'currency',
     currency: 'USD',
   });
 
   const handleCategorySubmit = e => {
+    // Function to handle the submit of adding a new category, prevent page reload, add new category to database,
+    // and set the view of the form to false
+
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_CATEGORY', payload: category.newCategoryReducer });
     setToggleCategoryAddForm(false);
   };
 
   const handleExpenseSubmit = e => {
+    // Function to handle the submit of adding a new expense, prevent page reload, add new expense to database,
+    // and set the view of the form to false
+
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_EXPENSE', payload: expense.newExpenseReducer });
     setToggleExpenseAddForm(false);
   };
 
   const handleIncomeSubmit = e => {
+    // Function to handle the submit of adding a new income, prevent page reload, add new income to database,
+    // and set the view of the form to false
+
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_INCOME', payload: expense.newIncomeReducer });
     setToggleIncomeAddForm(false);
   };
 
   const subRowClick = name => {
+    // When a user clicks a row inside of the subcategory table, fetch all of the transactions inside that subcat
+    // and toggle the view of the modal to true
+
     dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
     setToggleModal(true);
   };
@@ -61,12 +77,16 @@ function UserPage() {
   useEffect(() => {
     dispatch({ type: 'FETCH_LINK_TOKEN', payload: user.access_token });
     dispatch({ type: 'FETCH_CATEGORIES' });
+
+    // If the user has an access token associated with their profile, fetch transactions using the plaid api,
+    // else fetch transactions from the database
     user.access_token ? dispatch({ type: 'FETCH_PLAID_TRANSACTIONS' }) : dispatch({ type: 'FETCH_UNCATEGORIZED' });
   }, []);
 
   return (
     <div className="container">
       {!user.access_token &&
+        // If the user does not have an access token, render the plaidLink button to connect thier bank account
         <PlaidLink
           token={plaid.linkToken}
           onSuccess={plaidLinkSuccess}
@@ -74,6 +94,7 @@ function UserPage() {
           Connect to your Bank
       </PlaidLink>}
       {plaid.plaidError &&
+        // If plaid threw an error when trying to connect, render a plaidlink for the user to refresh their credentials
         <>
           <p>There was an error with Plaid, please update your bank credentials.</p>
           <PlaidLink
@@ -107,6 +128,9 @@ function UserPage() {
             </thead>
             <tbody>
               {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
+                // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
+                // If the transaction is from plaid, render a table row with the transaction data
+
                 for (const expense of expense.uncategorizedExpenseReducer) {
                   if (expense.transaction_id === subcategoryExpense.transaction_id) {
                     return (
@@ -132,6 +156,7 @@ function UserPage() {
         <div>
           <h2>Categories</h2>
           {toggleCategoryAddForm &&
+            // Checks state of the add category toggle to render the form or not
             <>
               <h3>Add a Category</h3>
               <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
@@ -153,14 +178,17 @@ function UserPage() {
                 <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
               </tr>
             </thead>
-            {category.categoryReducer.length > 0 && <tbody>
-              {category.categoryReducer.map(category =>
-                <tr key={category.id}>
-                  <td>{category.name}</td>
-                  <td>{toCurrency.format(category.coalesce)}</td>
-                  <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
-                </tr>)}
-            </tbody>}
+            {category.categoryReducer.length > 0 &&
+              // If there is data in the category reducer, render the table body
+              <tbody>
+                {category.categoryReducer.map(category =>
+                  // creates a table row for each item in the category reducer
+                  <tr key={category.id}>
+                    <td>{category.name}</td>
+                    <td>{toCurrency.format(category.coalesce)}</td>
+                    <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
+                  </tr>)}
+              </tbody>}
           </table >
         </div>
         <div>
@@ -172,12 +200,16 @@ function UserPage() {
                 <th>Transactions in subcategory</th>
               </tr>
             </thead>
-            {category.subcategoryReducer.length > 0 && <tbody>
-              {category.subcategoryReducer.map(subcategory => <tr className='subcategory-row' onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
-                <td>{subcategory.name}</td>
-                <td>{subcategory.count}</td>
-              </tr>)}
-            </tbody>}
+            {category.subcategoryReducer.length > 0 &&
+              // If there is data in the subcategory reducer, render the table body
+              <tbody>
+                {category.subcategoryReducer.map(subcategory =>
+                  // Creates a table row for each item in the subcategory reducer
+                  <tr className='subcategory-row' onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
+                    <td>{subcategory.name}</td>
+                    <td>{subcategory.count}</td>
+                  </tr>)}
+              </tbody>}
           </table>
         </div>
       </div>
@@ -196,24 +228,36 @@ function UserPage() {
               </th>
             </tr>
           </thead>
-          {expense.uncategorizedExpenseReducer.length > 0 && <tbody>
-            {expense.uncategorizedExpenseReducer.map(expense => <tr key={expense.id}>
-              <td>{expense.name}</td>
-              <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-              <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-              <td>
-                {expense.category_id === null &&
-                  <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
-                    <option value="0">Select a Category</option>
-                    {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
-                  </select>
-                }
-              </td>
-              <td>{!expense.transaction_id && <button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })} >Delete Item</button>}</td>
-            </tr>)}
-          </tbody>}
+          {expense.uncategorizedExpenseReducer.length > 0 &&
+            // If there is data in the uncategorized expense reducer, render the table body
+            <tbody>
+              {expense.uncategorizedExpenseReducer.map(expense =>
+                // Creates a table row for each item inside of the uncategorized expense reducer
+                <tr key={expense.id}>
+                  <td>{expense.name}</td>
+                  {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
+                  is positive, give the expense class to highlight red */}
+                  <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
+                  <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
+                  <td>
+                    {expense.category_id === null &&
+                      // If there is no category, render a select to update the category of the expense
+                      <select onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: expense.id, category_id: e.target.value } })} id="category-select" >
+                        <option value="0">Select a Category</option>
+                        {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
+                      </select>
+                    }
+                  </td>
+                  <td>
+                    {!expense.transaction_id &&
+                      // If the transaction is a client created transaction, render a delete button to be able to delte the expense
+                      <button onClick={() => dispatch({ type: 'DELETE_EXPENSE', payload: expense.id })}>Delete Item</button>}
+                  </td>
+                </tr>)}
+            </tbody>}
         </table>
         {toggleExpenseAddForm &&
+          // Checks the state of the add expense toggle to render a form or not
           <div>
             <h3>Add an Expense</h3>
             <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
@@ -243,6 +287,7 @@ function UserPage() {
           </div>
         }
         {toggleIncomeAddForm &&
+          // Checks the state of the add expense toggle to render a form or not
           <div>
             <h3>Add an Income</h3>
             <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
@@ -269,5 +314,4 @@ function UserPage() {
   );
 }
 
-// this allows us to use <App /> in index.js
 export default UserPage;

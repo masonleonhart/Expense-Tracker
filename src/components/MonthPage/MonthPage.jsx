@@ -117,6 +117,8 @@ function MonthPage() {
                         
                     <tr key={expense.id}>
                         <td>{expense.name}</td>
+                        {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
+                         is positive, give the expense class to highlight red */}
                         <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
                         <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
                         <td>{expense.category_name}</td>

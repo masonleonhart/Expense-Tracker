@@ -61,6 +61,7 @@ function Nav() {
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {matches &&
+            // Only show menu icon if screen width is shorter than the "matches" width
               <Button className={classes.menuButton}
                 onClick={() => !toggleDrawer ? setToggleDrawer(true) : setToggleDrawer(false)}
               >
@@ -71,9 +72,12 @@ function Nav() {
               <h2 className="nav-title">Expense Tracker</h2>
             </Link>
             {!matches &&
+              // If the screen width is more than the "matches" width, render the nav buttons
+              // On the nav bar
               <>
                 <Button>
                   {user.id && <HomeIcon style={{ color: 'white' }} />}
+                  {/* Render the home icon if the user is logged in */}
                   <Link className="navLink" to={loginLinkData.path}>
                     {loginLinkData.text}
                   </Link>
@@ -96,6 +100,8 @@ function Nav() {
             }
           </div>
           {user.id && !matches ? (
+            // If the user is logged in and the screen width is more than the screen width,
+            // render the nav buttons on the nav bar
             <Button onClick={() => dispatch({ type: 'LOGOUT' })}>
               <div className='navLink'>
                 <ExitToAppIcon />
@@ -123,11 +129,14 @@ function Nav() {
           <br />
           <Button className={classes.drawerButton} onClick={() => setToggleDrawer(false)}>
             {user.id && <HomeIcon />}
+            {/* render the home icon if the user is logged in */}
             <Link className='drawerNavLink' to={loginLinkData.path}>
               {loginLinkData.text}
             </Link>
           </Button>
           {user.id && <>
+            {/* If the user is logged in, render the nav links and the logout 
+            button in the drawer */}
             <Button className={classes.drawerButton} onClick={() => setToggleDrawer(false)}>
               <Link className='drawerNavLink' to="/day">
                 <TodayIcon />

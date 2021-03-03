@@ -9,8 +9,8 @@ const moment = require('moment');
 router.post('/', rejectUnauthenticated, (req, res) => {
     // Inserts a client created category into the category database
 
-    const sqlQuery = `INSERT INTO "category" ("user_id", "name")
-                        VALUES (${req.user.id}, $1);`;
+    const sqlQuery = `INSERT INTO "category" ("user_id", "name", "necessity")
+                        VALUES (${req.user.id}, $1, ${req.body.necessity});`;
 
     if (!req.body.name) {
         console.log('Try again with a valid field');

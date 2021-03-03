@@ -61,7 +61,7 @@ function Nav() {
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {matches &&
-            // Only show menu icon if screen width is shorter than the "matches" width
+              // Only show menu icon if screen width is shorter than the "matches" width
               <Button className={classes.menuButton}
                 onClick={() => !toggleDrawer ? setToggleDrawer(true) : setToggleDrawer(false)}
               >
@@ -83,19 +83,23 @@ function Nav() {
                   </Link>
                 </Button>
 
-                <Button>
-                  <Link className="navLink" to="/day">
-                    <TodayIcon />
-                    <p>Day Page</p>
-                  </Link>
-                </Button>
+                {user.id &&
+                  <>
+                    <Button>
+                      <Link className="navLink" to="/day">
+                        <TodayIcon />
+                        <p>Day Page</p>
+                      </Link>
+                    </Button>
 
-                <Button>
-                  <Link className="navLink" to="/month">
-                    <CalendarTodayIcon />
-                    <p>Month Page</p>
-                  </Link>
-                </Button>
+                    <Button>
+                      <Link className="navLink" to="/month">
+                        <CalendarTodayIcon />
+                        <p>Month Page</p>
+                      </Link>
+                    </Button>
+                  </>
+                }
               </>
             }
           </div>

@@ -77,6 +77,7 @@ function UserPage() {
   useEffect(() => {
     dispatch({ type: 'FETCH_LINK_TOKEN', payload: user.access_token });
     dispatch({ type: 'FETCH_CATEGORIES' });
+    dispatch({ type: 'FETCH_SUBCATEGORIES' });
 
     // If the user has an access token associated with their profile, fetch transactions using the plaid api,
     // else fetch transactions from the database
@@ -163,6 +164,19 @@ function UserPage() {
                 <label htmlFor="category-name-input">Category Name</label>
                 <br />
                 <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
+                <br />
+                <label htmlFor="necessity-false">Category of Necessities?</label>
+                <br />
+                <label htmlFor="necessity-false">No</label>
+                <input type="radio" name="necessity" id="necessity-false"
+                  checked={!category.newCategoryReducer.necessity}
+                  onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }}
+                />
+                <label htmlFor="necessity-true">Yes</label>
+                <input type="radio" name="necessity" id="necessity-true"
+                  checked={category.newCategoryReducer.necessity}
+                  onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }}
+                />
                 <br />
                 <br />
                 <button type='reset'>Cancel</button>

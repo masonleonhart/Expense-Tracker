@@ -153,8 +153,8 @@ function UserPage() {
         </div>
       </Modal>
       <div style={{ display: 'flex' }}>
-        <div>
-          <h2>Categories</h2>
+        <div className='overviewTables'>
+          <h1>Categories</h1>
           {toggleCategoryAddForm &&
             // Checks state of the add category toggle to render the form or not
             <>
@@ -170,7 +170,7 @@ function UserPage() {
               </form>
             </>
           }
-          <table id='category-table'>
+          <table>
             <thead>
               <tr>
                 <th>Name</th>
@@ -191,8 +191,8 @@ function UserPage() {
               </tbody>}
           </table >
         </div>
-        <div>
-          <h2>Subcategories</h2>
+        <div className='overviewTables'>
+          <h1>Subcategories</h1>
           <table>
             <thead>
               <tr>
@@ -213,9 +213,9 @@ function UserPage() {
           </table>
         </div>
       </div>
-      <h2>Uncategorized Transactions</h2>
-      <div id='expense-container'>
-        <table id='expense-table'>
+      <h1>Uncategorized Transactions</h1>
+      <div className='overviewTables'>
+        <table>
           <thead>
             <tr>
               <th>Name</th>

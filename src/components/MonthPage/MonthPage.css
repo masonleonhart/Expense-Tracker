@@ -16,21 +16,6 @@
     background-color: white;
 }
 
-@media (max-width: 320px) {
-    .container {
-        padding: 5px !important;
-    }
-
-    .react-calendar {
-        width: 100%;
-    }
-
-    .calendar-tile {
-        font-size: 9px !important;
-        min-height: 30px;
-    }
-}
-
 .daily-sum-income {
     color: green;
 }
@@ -45,4 +30,19 @@
     height: 100%;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 320px) {
+    .container {
+        padding: 5px !important;
+    }
+
+    .react-calendar {
+        width: 100%;
+    }
+
+    .calendar-tile {
+        font-size: 9px !important;
+        min-height: 30px;
+    }
 }

@@ -55,6 +55,7 @@ function MonthPage() {
 
     return (
         <div className='container'>
+            <br />
             <Calendar
                 calendarType='US'
                 tileContent={renderSum}
@@ -63,7 +64,7 @@ function MonthPage() {
                 prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
                 tileClassName='calendar-tile'
                 showNeighboringMonth={false}
-                maxDate={new Date(moment().endOf('month').format('YYYY-MM-DD'))}
+                maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
                 defaultActiveStartDate={new Date(
                     (Number(moment().add(currentMonth, 'months').format('YYYY'))),
                     (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
@@ -77,7 +78,7 @@ function MonthPage() {
                     let difference = clickedDay.diff(currentDay, 'days')
 
                     dispatch({ type: 'GO_TO_DAY', payload: difference });
-                    history.push('/info');
+                    history.push('/day');
                 }}
             >
             </Calendar>
@@ -112,17 +113,17 @@ function MonthPage() {
                     </tr>
                 </thead>
                 <tbody>
-                    {expense.monthlyExpenseReducer.map(expense => 
-                    // Creates a table row for each expense in the array of monthly expenses
-                        
-                    <tr key={expense.id}>
-                        <td>{expense.name}</td>
-                        {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
+                    {expense.monthlyExpenseReducer.map(expense =>
+                        // Creates a table row for each expense in the array of monthly expenses
+
+                        <tr key={expense.id}>
+                            <td>{expense.name}</td>
+                            {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
                          is positive, give the expense class to highlight red */}
-                        <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                        <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-                        <td>{expense.category_name}</td>
-                    </tr>)}
+                            <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
+                            <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
+                            <td>{expense.category_name}</td>
+                        </tr>)}
                 </tbody>
             </table>
         </div>

@@ -8,23 +8,12 @@
 }
 
 .react-calendar {
-    width: 30%;
+    width: 40%;
     margin: auto;
 }
 
-@media (max-width: 320px) {
-    .container {
-        padding: 5px !important;
-    }
-
-    .react-calendar {
-        width: 100%;
-    }
-
-    .calendar-tile {
-        font-size: 9px !important;
-        min-height: 30px;
-    }
+.react-calendar button:disabled {
+    background-color: white;
 }
 
 .daily-sum-income {
@@ -41,4 +30,19 @@
     height: 100%;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 320px) {
+    .container {
+        padding: 5px !important;
+    }
+
+    .react-calendar {
+        width: 100%;
+    }
+
+    .calendar-tile {
+        font-size: 9px !important;
+        min-height: 30px;
+    }
 }

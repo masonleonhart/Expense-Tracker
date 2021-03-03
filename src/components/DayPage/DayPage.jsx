@@ -3,7 +3,10 @@ import moment from 'moment';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import './InfoPage.css';
+import { makeStyles } from '@material-ui/core';
+import { Button } from '@material-ui/core';
+
+import './DayPage.css';
 
 function InfoPage() {
   const history = useHistory();
@@ -18,6 +21,19 @@ function InfoPage() {
     style: 'currency',
     currency: 'USD',
   });
+
+  const useStyles = makeStyles({
+    arrowNav: {
+      borderRadius: '50%',
+      borderWidth: '2px'
+    },
+    dayNav: {
+      minHeight: '64px',
+      borderRadius: '50%'
+    }
+  });
+
+  const classes = useStyles();
 
   const handleClick = (incomingDay) => {
     // Fetches expenses and categories for the new day that the user is navigating to
@@ -35,7 +51,7 @@ function InfoPage() {
 
   return (
     <div className="container" style={{ textAlign: 'center' }}>
-      <h1 className='day-nav' onClick={() => {
+      <Button onClick={() => {
         // Lets you navigate to the month page of the displayed month if the user clicks on the h1
 
         let clickedMonth = moment().add(currentDay, 'days').startOf('month');
@@ -44,17 +60,16 @@ function InfoPage() {
 
         dispatch({ type: 'GO_TO_MONTH', payload: difference });
         history.push('/month');
-      }}>{moment().add(currentDay, 'days').format('MMMM')}</h1>
-      <br />
+      }}><h1>{moment().add(currentDay, 'days').format('MMMM')}</h1></Button>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '50%' }}>
-          <h1 className='day-nav' onClick={() => handleClick(-1)}>‹</h1>
-          <h4 className='day-nav' onClick={() => handleClick(-2)}>{moment().add(currentDay - 2, 'days').format('DD')}</h4>
-          <h4 className='day-nav' onClick={() => handleClick(-1)}>{moment().add(currentDay - 1, 'days').format('DD')}</h4>
-          <h2 className='day-nav' onClick={() => handleClick(0)}>{moment().add(currentDay, 'days').format('DD')}</h2>
-          <h4 className='day-nav' onClick={() => handleClick(1)}>{moment().add(currentDay + 1, 'days').format('DD')}</h4>
-          <h4 className='day-nav' onClick={() => handleClick(2)}>{moment().add(currentDay + 2, 'days').format('DD')}</h4>
-          <h1 className='day-nav' onClick={() => handleClick(1)}>›</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '40%' }}>
+          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(-1)}><h1 style={{ margin: '0' }}>‹</h1></Button>
+          <Button  className={classes.dayNav} onClick={() => handleClick(-2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 2, 'days').format('DD')}</h4></Button>
+          <Button  className={classes.dayNav} onClick={() => handleClick(-1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 1, 'days').format('DD')}</h4></Button>
+          <h2 style={{ margin: '0', userSelect: 'none' }}>{moment().add(currentDay, 'days').format('DD')}</h2>
+          <Button  className={classes.dayNav} onClick={() => handleClick(1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 1, 'days').format('DD')}</h4></Button>
+          <Button  className={classes.dayNav} onClick={() => handleClick(2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 2, 'days').format('DD')}</h4></Button>
+          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(1)}><h1 style={{ margin: '0' }}>›</h1></Button>
         </div>
       </div>
       <br />

@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import MaterialTable from 'material-table';
+import tableIcons from '../../hooks/materialTableIcons';
+
 import 'react-calendar/dist/Calendar.css';
 import './MonthPage.css'
 
@@ -84,48 +87,56 @@ function MonthPage() {
             </Calendar>
             <br />
             <br />
-            <table style={{ margin: 'auto' }}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Total Spent in Category</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {category.monthlyCategoryReducer.map(category =>
-                        // Creates a table row for each category in the array of monthly categories
-
-                        <tr key={category.id}>
-                            <td>{category.name}</td>
-                            <td>{toCurrency.format(category.sum)}</td>
-                        </tr>)}
-                </tbody>
-            </table >
+            <MaterialTable
+                style={{ maxWidth: '80%', margin: 'auto' }}
+                title='Categories'
+                icons={tableIcons}
+                columns={[
+                    { title: 'Name', field: 'name' },
+                    {
+                        title: 'Category of Necessities', render: (rowData) => {
+                            return (
+                                <>
+                                    {!category.dailyCategoryReducer.necessity ? <p>Yes</p> : <p>No</p>}
+                                </>
+                            );
+                        }
+                    },
+                    { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
+                ]}
+                data={category.monthlyCategoryReducer}
+            />
             <br />
             <br />
-            <table style={{ margin: 'auto' }}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Category</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {expense.monthlyExpenseReducer.map(expense =>
-                        // Creates a table row for each expense in the array of monthly expenses
-
-                        <tr key={expense.id}>
-                            <td>{expense.name}</td>
-                            {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
-                         is positive, give the expense class to highlight red */}
-                            <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                            <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-                            <td>{expense.category_name}</td>
-                        </tr>)}
-                </tbody>
-            </table>
+            <MaterialTable
+                style={{ maxWidth: '80%', margin: 'auto' }}
+                title='Transactions'
+                icons={tableIcons}
+                columns={[
+                    { title: 'Name', field: 'name' },
+                    {
+                        title: 'Date', render: (rowData) => {
+                            return (
+                                <>
+                                    {moment(rowData.date).format('YYYY-MM-DD')}
+                                </>
+                            );
+                        }
+                    },
+                    { title: 'Category', field: 'category_name' },
+                    {
+                        title: 'Amount', type: 'currency', render: (rowData) => {
+                            return (
+                                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                                    {toCurrency.format(Number(rowData.amount) < 0 ?
+                                        (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                                </p>
+                            );
+                        }
+                    },
+                ]}
+                data={expense.monthlyExpenseReducer}
+            />
         </div>
     );
 };

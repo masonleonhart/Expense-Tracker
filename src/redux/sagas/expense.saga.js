@@ -7,6 +7,7 @@ function* fetchUncategorizedSaga() {
         const response = yield axios.get('/api/expense/uncategorized');
         yield put({ type: 'SET_UNCATEGORIZED', payload: response.data });
     } catch (error) {
+        console.log(error)
         console.log('Error in fetching expenses', error);
     };
 };

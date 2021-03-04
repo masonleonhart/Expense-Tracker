@@ -32,9 +32,9 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 router.get('/main', rejectUnauthenticated, (req, res) => {
     // Gets all client created categoreis from the database
 
-    const newQueryText = `SELECT c.id, c.name, COALESCE(SUM(th.amount), 0) FROM "category" as c
+    const newQueryText = `SELECT c.id, c.name, COUNT(c.name), necessity FROM "category" as c
                             FULL JOIN "transaction-history" as th on c.id = th.category_id
-                            WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COALESCE DESC;`;
+                            WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY c.name ASC;`;
 
     pool.query(newQueryText).then(result => {
         console.log('Retrieved categories successfully');
@@ -65,7 +65,7 @@ router.get('/daily/:day', rejectUnauthenticated, (req, res) => {
     // Gets all client created categories associated to the day sent over from the client
 
     const dayToQuery = moment().add(req.params.day, 'days').format('YYYY-MM-DD');
-    const sqlQueryTwo = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
+    const sqlQueryTwo = `SELECT c.id, c.name, c.necessity, SUM(th.amount) FROM "category" as c
                             JOIN "transaction-history" as th on c.id = th.category_id
                             WHERE c.user_id = ${req.user.id} AND th.date = $1 GROUP BY c.id
                             ORDER BY SUM DESC;`;
@@ -84,7 +84,7 @@ router.get('/monthly/:month', rejectUnauthenticated, (req, res) => {
 
     const startMonthToQuery = moment().add(req.params.month, 'months').startOf('month').format('YYYY-MM-DD');
     const endMonthToQuery = moment().add(req.params.month, 'months').endOf('month').format('YYYY-MM-DD');
-    const sqlQuery = `SELECT c.id, c.name, SUM(th.amount) FROM "category" as c
+    const sqlQuery = `SELECT c.id, c.name, c.necessity, SUM(th.amount) FROM "category" as c
                         JOIN "transaction-history" as th on c.id = th.category_id
                         WHERE c.user_id = ${req.user.id} AND th.date BETWEEN $1 AND $2
                         GROUP BY c.id ORDER BY SUM DESC;`;

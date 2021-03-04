@@ -88,7 +88,7 @@ function InfoPage() {
             title: 'Category of Necessities', render: (rowData) => {
               return (
                 <>
-                  {!category.dailyCategoryReducer.necessity ? <p>Yes</p> : <p>No</p>}
+                  {rowData.necessity ? <p>Yes</p> : <p>No</p>}
                 </>
               );
             }

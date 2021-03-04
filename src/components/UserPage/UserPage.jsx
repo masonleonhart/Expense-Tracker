@@ -4,10 +4,12 @@ import { PlaidLink } from 'react-plaid-link';
 import axios from 'axios';
 import moment from 'moment';
 
-import { Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
+import { Button, Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
 
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
+
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import './UserPage.css'
 
@@ -78,8 +80,11 @@ function UserPage() {
   };
 
   const useStyles = makeStyles({
-    formControl: {
+    uncategorizedFormControl: {
       minWidth: 150
+    },
+    categoriesButton: {
+      minWidth: 10
     }
   });
 
@@ -164,80 +169,94 @@ function UserPage() {
           <br />
         </div>
       </Modal>
-      <div style={{ display: 'flex' }}>
-        <div className='overviewTables'>
-          <h1>Categories</h1>
-          {toggleCategoryAddForm &&
-            // Checks state of the add category toggle to render the form or not
-            <>
-              <h3>Add a Category</h3>
-              <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
-                <label htmlFor="category-name-input">Category Name</label>
-                <br />
-                <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
-                <br />
-                <label htmlFor="necessity-false">Category of Necessities?</label>
-                <br />
-                <label htmlFor="necessity-false">No</label>
-                <input type="radio" name="necessity" id="necessity-false"
-                  checked={!category.newCategoryReducer.necessity}
-                  onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }}
-                />
-                <label htmlFor="necessity-true">Yes</label>
-                <input type="radio" name="necessity" id="necessity-true"
-                  checked={category.newCategoryReducer.necessity}
-                  onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }}
-                />
-                <br />
-                <br />
-                <button type='reset'>Cancel</button>
-                <button type='submit'>Save</button>
-              </form>
-            </>
-          }
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Total Spent in Category</th>
-                <th><button onClick={() => !toggleCategoryAddForm ? setToggleCategoryAddForm(true) : setToggleCategoryAddForm(false)}>Add Category</button></th>
-              </tr>
-            </thead>
-            {category.categoryReducer.length > 0 &&
-              // If there is data in the category reducer, render the table body
-              <tbody>
-                {category.categoryReducer.map(category =>
-                  // creates a table row for each item in the category reducer
-                  <tr key={category.id}>
-                    <td>{category.name}</td>
-                    <td>{toCurrency.format(category.coalesce)}</td>
-                    <td><button onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: category.id })}>Delete Category</button></td>
-                  </tr>)}
-              </tbody>}
-          </table >
+      <br />
+      <div style={{ display: 'flex', maxWidth: '80%', margin: 'auto', justifyContent: 'space-between'  }}>
+        <div style={{ minWidth: '53%' }}>
+          <MaterialTable
+            title='Categories'
+            icons={tableIcons}
+            columns={[
+              { title: 'Name', field: 'name' },
+              {
+                title: 'Necessity', render: (rowData) => {
+                  return (
+                    <>
+                      {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                    </>
+                  );
+                }
+              },
+              {
+                title: 'Expenses in category', render: (rowData) => {
+                  return (
+                    <p>{rowData.count}</p>
+                  );
+                }
+              },
+              {
+                title: 'Delete', render: (rowData) => {
+                  return (
+                    <Button className={classes.categoriesButton}><DeleteIcon /></Button>
+                  );
+                }
+              },
+            ]}
+            data={category.categoryReducer}
+          />
         </div>
-        <div className='overviewTables'>
-          <h1>Subcategories</h1>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Transactions in subcategory</th>
-              </tr>
-            </thead>
-            {category.subcategoryReducer.length > 0 &&
-              // If there is data in the subcategory reducer, render the table body
-              <tbody>
-                {category.subcategoryReducer.map(subcategory =>
-                  // Creates a table row for each item in the subcategory reducer
-                  <tr className='subcategory-row' onClick={() => subRowClick(subcategory.name)} key={subcategory.name}>
-                    <td>{subcategory.name}</td>
-                    <td>{subcategory.count}</td>
-                  </tr>)}
-              </tbody>}
-          </table>
+        <div style={{ minWidth: '43%' }}>
+          <MaterialTable
+            title='Subcategories'
+            icons={tableIcons}
+            options={{
+              searchFieldAlignment: 'right',
+              searchFieldStyle: {
+                maxWidth: 209
+              }
+            }}
+            columns={[
+              { title: 'Name', field: 'name' },
+              {
+                title: 'Expenses in subcategory', render: (rowData) => {
+                  return (
+                    <p>{rowData.count}</p>
+                  );
+                }
+              },
+            ]}
+            data={category.subcategoryReducer}
+          />
         </div>
+        {toggleCategoryAddForm &&
+          // Checks state of the add category toggle to render the form or not
+          <>
+            <h3>Add a Category</h3>
+            <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
+              <label htmlFor="category-name-input">Category Name</label>
+              <br />
+              <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
+              <br />
+              <label htmlFor="necessity-false">Category of Necessities?</label>
+              <br />
+              <label htmlFor="necessity-false">No</label>
+              <input type="radio" name="necessity" id="necessity-false"
+                checked={!category.newCategoryReducer.necessity}
+                onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }}
+              />
+              <label htmlFor="necessity-true">Yes</label>
+              <input type="radio" name="necessity" id="necessity-true"
+                checked={category.newCategoryReducer.necessity}
+                onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }}
+              />
+              <br />
+              <br />
+              <button type='reset'>Cancel</button>
+              <button type='submit'>Save</button>
+            </form>
+          </>
+        }
       </div>
+      <br />
       <MaterialTable
         style={{ maxWidth: '80%', margin: 'auto' }}
         title='Uncategorized Expenses'
@@ -256,7 +275,7 @@ function UserPage() {
           {
             title: 'Category', render: (rowData) => {
               return (
-                <FormControl className={classes.formControl}>
+                <FormControl className={classes.uncategorizedFormControl}>
                   <InputLabel id='select-label'>Select a Category</InputLabel>
                   <Select
                     labelId='select-label'

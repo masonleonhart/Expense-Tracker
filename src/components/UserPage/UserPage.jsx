@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PlaidLink } from 'react-plaid-link';
-import axios from 'axios';
 import moment from 'moment';
 
 import { Button, Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
@@ -23,7 +21,6 @@ function UserPage() {
   const dispatch = useDispatch();
   const expense = useSelector(store => store.expense);
   const category = useSelector(store => store.category);
-  const plaid = useSelector(store => store.plaid);
   const user = useSelector(store => store.user);
 
   const [toggleSubcatExpenses, setToggleSubcatExpenses] = useState(false);
@@ -32,18 +29,6 @@ function UserPage() {
   const [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
   const [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
   const [toggleModal, setToggleModal] = useState(false);
-
-  const plaidLinkSuccess = React.useCallback(async public_token => {
-    // An on success function for the plaid link, when a successful link is created, wait 3 seconds and
-    // fetch the user again so the access token appears in state
-
-    try {
-      await axios.post('/api/plaid/exchange_token', { public_token });
-      setTimeout(() => dispatch({ type: 'FETCH_USER' }), 3000);
-    } catch (error) {
-      console.log('Error in exchanging tokens', error);
-    };
-  });
 
   const toCurrency = new Intl.NumberFormat('en-US', {
     // Converts a number to US currency format
@@ -98,6 +83,13 @@ function UserPage() {
     setToggleModal(true);
   };
 
+  const handleModalClose = () => {
+    setToggleModal(false);
+    setToggleCatExpenses(false);
+    setToggleSubcatExpenses(false);
+    setToggleCategoryAddForm(false);
+  };
+
   const theme = createMuiTheme({
     palette: {
       primary: {
@@ -139,26 +131,6 @@ function UserPage() {
   return (
     <ThemeProvider theme={theme}>
       <div className="container">
-        {!user.access_token &&
-          // If the user does not have an access token, render the plaidLink button to connect thier bank account
-          <PlaidLink
-            token={plaid.linkToken}
-            onSuccess={plaidLinkSuccess}
-          >
-            Connect to your Bank
-      </PlaidLink>}
-        {plaid.plaidError &&
-          // If plaid threw an error when trying to connect, render a plaidlink for the user to refresh their credentials
-          <>
-            <p>There was an error with Plaid, please update your bank credentials.</p>
-            <PlaidLink
-              token={plaid.linkToken}
-              onSuccess={(public_token, metadata) => setTimeout(() => { dispatch({ type: 'SET_PLAID_ERROR_FALSE' }); dispatch({ type: 'FETCH_USER' }) }, 3000)}
-            >
-              Update your credentials
-          </PlaidLink>
-          </>
-        }
         <Modal
           style={{
             width: '60%',
@@ -169,7 +141,7 @@ function UserPage() {
           className={classes.modal}
           disableAutoFocus={true}
           open={toggleModal}
-          onClose={() => setToggleModal(false)}
+          onClose={handleModalClose}
         >
           <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
             {toggleCatExpenses && <>

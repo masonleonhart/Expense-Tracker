@@ -5,11 +5,14 @@ import axios from 'axios';
 import moment from 'moment';
 
 import { Button, Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
 
 import DeleteIcon from '@material-ui/icons/Delete';
+import MoreVert from '@material-ui/icons/MoreVert';
+import Add from '@material-ui/icons/Add';
 
 import './UserPage.css'
 
@@ -71,6 +74,14 @@ function UserPage() {
     setToggleIncomeAddForm(false);
   };
 
+  const mainRowClick = name => {
+    // When a user clicks a row inside of the category table, fetch all of the transactions inside that cat
+    // and toggle the view of the modal to true
+
+    dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
+    setToggleModal(true);
+  };
+
   const subRowClick = name => {
     // When a user clicks a row inside of the subcategory table, fetch all of the transactions inside that subcat
     // and toggle the view of the modal to true
@@ -85,6 +96,16 @@ function UserPage() {
     },
     categoriesButton: {
       minWidth: 10
+    },
+    incomeAmount: {
+      color: 'green'
+    },
+    expenseAmount: {
+      color: 'red'
+    },
+    modalButton: {
+      backgroundColor: '#4CBB17',
+      color: 'white'
     }
   });
 
@@ -124,61 +145,65 @@ function UserPage() {
       }
       <Modal
         style={{
-          width: '50%',
+          width: '60%',
           margin: 'auto',
           height: '100%',
-          top: '20%'
+          top: '20%',
         }}
+        className={classes.modal}
+        disableAutoFocus={true}
         open={toggleModal}
         onClose={() => setToggleModal(false)}
       >
         <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
           <h2>Expenses in {expense.subcatViewNameReducer}</h2>
           <br />
-          <table style={{ margin: 'auto' }}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
-                // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
-                // If the transaction is from plaid, render a table row with the transaction data
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Amount</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
+                  // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
+                  // If the transaction is from plaid, render a table row with the transaction data
 
-                for (const expense of expense.uncategorizedExpenseReducer) {
-                  if (expense.transaction_id === subcategoryExpense.transaction_id) {
-                    return (
-                      <tr key={expense.id}>
-                        <td>{expense.name}</td>
-                        <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                        <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-                      </tr>
-                    );
+                  for (const expense of expense.uncategorizedExpenseReducer) {
+                    if (expense.transaction_id === subcategoryExpense.transaction_id) {
+                      return (
+                        <TableRow key={expense.id}>
+                          <TableCell>{expense.name}</TableCell>
+                          <TableCell>{moment(expense.date).format('MM-DD-YYYY')}</TableCell>
+                          <TableCell className={expense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</TableCell>
+                        </TableRow>
+                      );
+                    };
                   };
-                };
-              })}
-            </tbody>
-          </table>
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <br />
           <br />
-          <button onClick={() => setToggleModal(false)}>OK</button>
+          <Button className={classes.modalButton}variant='contained' onClick={() => setToggleModal(false)}>OK</Button>
           <br />
           <br />
         </div>
       </Modal>
       <br />
-      <div style={{ display: 'flex', maxWidth: '80%', margin: 'auto', justifyContent: 'space-between'  }}>
-        <div style={{ minWidth: '53%' }}>
+      <div style={{ display: 'flex', maxWidth: '91%', margin: 'auto', justifyContent: 'space-between' }}>
+        <div style={{ minWidth: '46%' }}>
           <MaterialTable
             title='Categories'
             icons={tableIcons}
             columns={[
               { title: 'Name', field: 'name' },
               {
-                title: 'Necessity', render: (rowData) => {
+                title: 'Necessity', sorting: false, render: (rowData) => {
                   return (
                     <>
                       {rowData.necessity ? <p>Yes</p> : <p>No</p>}
@@ -187,43 +212,85 @@ function UserPage() {
                 }
               },
               {
-                title: 'Expenses in category', render: (rowData) => {
+                title: 'Expenses in Category', sorting: false, type: 'numeric', render: (rowData) => {
                   return (
                     <p>{rowData.count}</p>
                   );
                 }
               },
+            ]}
+            actions={[
               {
-                title: 'Delete', render: (rowData) => {
+                tooltip: 'Details',
+                icon: () => {
                   return (
-                    <Button className={classes.categoriesButton}><DeleteIcon /></Button>
+                    <MoreVert />
                   );
+                },
+                onClick: (event, rowData) => {
+                  mainRowClick()
                 }
               },
+              {
+                tooltip: 'Delete Category',
+                icon: () => {
+                  return (
+                    <DeleteIcon />
+                  );
+                },
+                onClick: (event, rowData) => {
+                  dispatch({ type: 'DELETE_CATEGORY', payload: rowData.id });
+                }
+              },
+              {
+                tooltip: 'Add Category',
+                isFreeAction: true,
+                icon: () => {
+                  return (
+                    <Add />
+                  );
+                },
+                onClick: (event, rowData) => {
+
+                }
+              }
             ]}
+            options={{
+              actionsColumnIndex: -1
+            }}
             data={category.categoryReducer}
           />
         </div>
-        <div style={{ minWidth: '43%' }}>
+        <div style={{ minWidth: '35%' }}>
           <MaterialTable
             title='Subcategories'
             icons={tableIcons}
-            options={{
-              searchFieldAlignment: 'right',
-              searchFieldStyle: {
-                maxWidth: 209
-              }
-            }}
             columns={[
               { title: 'Name', field: 'name' },
               {
-                title: 'Expenses in subcategory', render: (rowData) => {
+                title: 'Expenses in Subcategory', sorting: false, type: 'numeric', render: (rowData) => {
                   return (
                     <p>{rowData.count}</p>
                   );
                 }
               },
             ]}
+            actions={[
+              {
+                tooltip: 'Details',
+                icon: () => {
+                  return (
+                    <MoreVert />
+                  );
+                },
+                onClick: (event, rowData) => {
+                  subRowClick(rowData.name);
+                }
+              }
+            ]}
+            options={{
+              actionsColumnIndex: -1
+            }}
             data={category.subcategoryReducer}
           />
         </div>
@@ -258,16 +325,19 @@ function UserPage() {
       </div>
       <br />
       <MaterialTable
-        style={{ maxWidth: '80%', margin: 'auto' }}
+        style={{ maxWidth: '91%', margin: 'auto' }}
         title='Uncategorized Expenses'
         icons={tableIcons}
+        options={{
+          pageSize: 10
+        }}
         columns={[
           { title: 'Name', field: 'name' },
           {
             title: 'Date', render: (rowData) => {
               return (
                 <>
-                  {moment(rowData.date).format('YYYY-MM-DD')}
+                  {moment(rowData.date).format('MM-DD-YYYY')}
                 </>
               );
             }

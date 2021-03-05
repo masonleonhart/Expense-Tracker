@@ -109,7 +109,7 @@ function InfoPage() {
             title: 'Date', render: (rowData) => {
               return (
                 <>
-                  {moment(rowData.date).format('YYYY-MM-DD')}
+                  {moment(rowData.date).format('MM-DD-YYYY')}
                 </>
               );
             }

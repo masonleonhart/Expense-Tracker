@@ -23,6 +23,8 @@ function UserPage() {
   const plaid = useSelector(store => store.plaid);
   const user = useSelector(store => store.user);
 
+  const [toggleSubcatExpenses, setToggleSubcatExpenses] = useState(false);
+  const [toggleCatExpenses, setToggleCatExpenses] = useState(false);
   const [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
   const [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
   const [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
@@ -74,11 +76,12 @@ function UserPage() {
     setToggleIncomeAddForm(false);
   };
 
-  const mainRowClick = name => {
+  const mainRowClick = obj => {
     // When a user clicks a row inside of the category table, fetch all of the transactions inside that cat
     // and toggle the view of the modal to true
 
-    dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
+    dispatch({ type: 'FETCH_CAT_TRANSACTIONS', payload: obj });
+    setToggleCatExpenses(true);
     setToggleModal(true);
   };
 
@@ -87,6 +90,7 @@ function UserPage() {
     // and toggle the view of the modal to true
 
     dispatch({ type: 'FETCH_SUBCAT_TRANSACTIONS', payload: name });
+    setToggleSubcatExpenses(true);
     setToggleModal(true);
   };
 
@@ -156,40 +160,69 @@ function UserPage() {
         onClose={() => setToggleModal(false)}
       >
         <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
-          <h2>Expenses in {expense.subcatViewNameReducer}</h2>
-          <br />
-          <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Amount</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
-                  // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
-                  // If the transaction is from plaid, render a table row with the transaction data
+          {toggleCatExpenses && <>
+            <h2>Expenses in {expense.catViewNameReducer}</h2>
+            <br />
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {expense.categoryExpenseReducer.map(categoryExpense =>
+                    <TableRow key={categoryExpense.id}>
+                      <TableCell>{categoryExpense.name}</TableCell>
+                      <TableCell>{moment(categoryExpense.date).format('MM-DD-YYYY')}</TableCell>
+                      <TableCell className={categoryExpense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(categoryExpense.amount) < 0 ? (Number(categoryExpense.amount) * -1) : Number(categoryExpense.amount))}</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <br />
+            <br />
+            <Button className={classes.modalButton} variant='contained' onClick={() => { setToggleCatExpenses(false); setToggleModal(false) }}>OK</Button>
+          </>}
+          {toggleSubcatExpenses && <>
+            <h2>Expenses in {expense.subcatViewNameReducer}</h2>
+            <br />
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
+                    // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
+                    // If the transaction is from plaid, render a table row with the transaction data
 
-                  for (const expense of expense.uncategorizedExpenseReducer) {
-                    if (expense.transaction_id === subcategoryExpense.transaction_id) {
-                      return (
-                        <TableRow key={expense.id}>
-                          <TableCell>{expense.name}</TableCell>
-                          <TableCell>{moment(expense.date).format('MM-DD-YYYY')}</TableCell>
-                          <TableCell className={expense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</TableCell>
-                        </TableRow>
-                      );
+                    for (const expense of expense.uncategorizedExpenseReducer) {
+                      if (expense.transaction_id === subcategoryExpense.transaction_id) {
+                        return (
+                          <TableRow key={expense.id}>
+                            <TableCell>{expense.name}</TableCell>
+                            <TableCell>{moment(expense.date).format('MM-DD-YYYY')}</TableCell>
+                            <TableCell className={expense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</TableCell>
+                          </TableRow>
+                        );
+                      };
                     };
-                  };
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <br />
-          <br />
-          <Button className={classes.modalButton}variant='contained' onClick={() => setToggleModal(false)}>OK</Button>
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <br />
+            <br />
+            <Button className={classes.modalButton} variant='contained' onClick={() => { setToggleSubcatExpenses(false); setToggleModal(false) }}>OK</Button>
+          </>}
           <br />
           <br />
         </div>
@@ -228,7 +261,7 @@ function UserPage() {
                   );
                 },
                 onClick: (event, rowData) => {
-                  mainRowClick()
+                  mainRowClick({ name: rowData.name, id: rowData.id })
                 }
               },
               {

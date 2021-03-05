@@ -72,6 +72,23 @@ router.get('/uncategorized', rejectUnauthenticated, (req, res) => {
     });
 });
 
+router.get('/category/transactions/:id', rejectUnauthenticated, (req, res) => {
+    // Grabs all transactions associated to a specified category from the database
+
+    const sqlQuery = `SELECT th."name", th."amount", th."date" FROM "category" as c
+                        JOIN "transaction-history" as th on c."id" = th."category_id"
+                        WHERE c."id" = '${req.params.id}' 
+                        AND c."user_id" = ${req.user.id} ORDER BY DATE DESC;`;
+    
+    pool.query(sqlQuery).then(response => {
+        console.log('Retrieved subcategory transactions successfully');
+        res.send(response.rows).status(200);
+    }).catch(err => {
+        console.log('Error in fetching subcategory transactions', err);
+        res.sendStatus(500);
+    });
+});
+
 router.get('/subcategory/transactions/:name', rejectUnauthenticated, (req, res) => {
     // Grabs all plaid transactions associated to a specified subcategory (categories associated to the 
     // transactions pulled from plaid) from the database

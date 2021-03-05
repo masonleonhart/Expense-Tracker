@@ -32,9 +32,9 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 router.get('/main', rejectUnauthenticated, (req, res) => {
     // Gets all client created categoreis from the database
 
-    const newQueryText = `SELECT c.id, c.name, COUNT(c.name), necessity FROM "category" as c
+    const newQueryText = `SELECT c.id, c.name, COUNT(th.category_id), necessity FROM "category" as c
                             FULL JOIN "transaction-history" as th on c.id = th.category_id
-                            WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY c.name ASC;`;
+                            WHERE c.user_id = ${req.user.id} GROUP BY c.id ORDER BY COUNT DESC;`;
 
     pool.query(newQueryText).then(result => {
         console.log('Retrieved categories successfully');

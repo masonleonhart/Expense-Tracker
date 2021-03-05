@@ -8,6 +8,26 @@ const uncategorizedExpenseReducer = (state = [], action) => {
         default:
             return state;
     };
+}; 
+
+const catViewNameReducer = (state = '', action) => {
+    // manages subcategory name of list of transactions in modal
+    switch (action.type) {
+        case 'SET_CAT_VIEW_NAME':
+            return action.payload;
+        default:
+            return state;
+    };
+};
+
+const categoryExpenseReducer = (state = [], action) => {
+    // manages list of subcategory expenses
+    switch (action.type) {
+        case 'SET_CAT_TRANSACTIONS':
+            return action.payload;
+        default:
+            return state;
+    };
 };
 
 const subcatViewNameReducer = (state = '', action) => {
@@ -131,6 +151,8 @@ const newIncomeReducer = (state = { income: true, name: '', amount: '', date: ''
 
 export default combineReducers({
     uncategorizedExpenseReducer,
+    catViewNameReducer,
+    categoryExpenseReducer,
     subcatViewNameReducer,
     subcategoryExpenseReducer,
     newExpenseReducer,

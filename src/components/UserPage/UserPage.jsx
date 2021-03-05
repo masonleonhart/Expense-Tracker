@@ -6,6 +6,9 @@ import moment from 'moment';
 
 import { Button, Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { TextField, FormLabel, RadioGroup, Radio, FormControlLabel, ButtonGroup } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
@@ -56,6 +59,7 @@ function UserPage() {
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_CATEGORY', payload: category.newCategoryReducer });
     setToggleCategoryAddForm(false);
+    setToggleModal(false);
   };
 
   const handleExpenseSubmit = e => {
@@ -94,6 +98,14 @@ function UserPage() {
     setToggleModal(true);
   };
 
+  const theme = createMuiTheme({
+    palette: {
+      primary: {
+        main: '#4CBB17'
+      }
+    }
+  });
+
   const useStyles = makeStyles({
     uncategorizedFormControl: {
       minWidth: 150
@@ -108,7 +120,6 @@ function UserPage() {
       color: 'red'
     },
     modalButton: {
-      backgroundColor: '#4CBB17',
       color: 'white'
     }
   });
@@ -126,338 +137,349 @@ function UserPage() {
   }, []);
 
   return (
-    <div className="container">
-      {!user.access_token &&
-        // If the user does not have an access token, render the plaidLink button to connect thier bank account
-        <PlaidLink
-          token={plaid.linkToken}
-          onSuccess={plaidLinkSuccess}
-        >
-          Connect to your Bank
-      </PlaidLink>}
-      {plaid.plaidError &&
-        // If plaid threw an error when trying to connect, render a plaidlink for the user to refresh their credentials
-        <>
-          <p>There was an error with Plaid, please update your bank credentials.</p>
+    <ThemeProvider theme={theme}>
+      <div className="container">
+        {!user.access_token &&
+          // If the user does not have an access token, render the plaidLink button to connect thier bank account
           <PlaidLink
             token={plaid.linkToken}
-            onSuccess={(public_token, metadata) => setTimeout(() => { dispatch({ type: 'SET_PLAID_ERROR_FALSE' }); dispatch({ type: 'FETCH_USER' }) }, 3000)}
+            onSuccess={plaidLinkSuccess}
           >
-            Update your credentials
-          </PlaidLink>
-        </>
-      }
-      <Modal
-        style={{
-          width: '60%',
-          margin: 'auto',
-          height: '100%',
-          top: '20%',
-        }}
-        className={classes.modal}
-        disableAutoFocus={true}
-        open={toggleModal}
-        onClose={() => setToggleModal(false)}
-      >
-        <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
-          {toggleCatExpenses && <>
-            <h2>Expenses in {expense.catViewNameReducer}</h2>
-            <br />
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {expense.categoryExpenseReducer.map(categoryExpense =>
-                    <TableRow key={categoryExpense.id}>
-                      <TableCell>{categoryExpense.name}</TableCell>
-                      <TableCell>{moment(categoryExpense.date).format('MM-DD-YYYY')}</TableCell>
-                      <TableCell className={categoryExpense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(categoryExpense.amount) < 0 ? (Number(categoryExpense.amount) * -1) : Number(categoryExpense.amount))}</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <br />
-            <br />
-            <Button className={classes.modalButton} variant='contained' onClick={() => { setToggleCatExpenses(false); setToggleModal(false) }}>OK</Button>
-          </>}
-          {toggleSubcatExpenses && <>
-            <h2>Expenses in {expense.subcatViewNameReducer}</h2>
-            <br />
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Amount</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
-                    // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
-                    // If the transaction is from plaid, render a table row with the transaction data
-
-                    for (const expense of expense.uncategorizedExpenseReducer) {
-                      if (expense.transaction_id === subcategoryExpense.transaction_id) {
-                        return (
-                          <TableRow key={expense.id}>
-                            <TableCell>{expense.name}</TableCell>
-                            <TableCell>{moment(expense.date).format('MM-DD-YYYY')}</TableCell>
-                            <TableCell className={expense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</TableCell>
-                          </TableRow>
-                        );
-                      };
-                    };
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <br />
-            <br />
-            <Button className={classes.modalButton} variant='contained' onClick={() => { setToggleSubcatExpenses(false); setToggleModal(false) }}>OK</Button>
-          </>}
-          <br />
-          <br />
-        </div>
-      </Modal>
-      <br />
-      <div style={{ display: 'flex', maxWidth: '91%', margin: 'auto', justifyContent: 'space-between' }}>
-        <div style={{ minWidth: '46%' }}>
-          <MaterialTable
-            title='Categories'
-            icons={tableIcons}
-            columns={[
-              { title: 'Name', field: 'name' },
-              {
-                title: 'Necessity', sorting: false, render: (rowData) => {
-                  return (
-                    <>
-                      {rowData.necessity ? <p>Yes</p> : <p>No</p>}
-                    </>
-                  );
-                }
-              },
-              {
-                title: 'Expenses in Category', sorting: false, type: 'numeric', render: (rowData) => {
-                  return (
-                    <p>{rowData.count}</p>
-                  );
-                }
-              },
-            ]}
-            actions={[
-              {
-                tooltip: 'Details',
-                icon: () => {
-                  return (
-                    <MoreVert />
-                  );
-                },
-                onClick: (event, rowData) => {
-                  mainRowClick({ name: rowData.name, id: rowData.id })
-                }
-              },
-              {
-                tooltip: 'Delete Category',
-                icon: () => {
-                  return (
-                    <DeleteIcon />
-                  );
-                },
-                onClick: (event, rowData) => {
-                  dispatch({ type: 'DELETE_CATEGORY', payload: rowData.id });
-                }
-              },
-              {
-                tooltip: 'Add Category',
-                isFreeAction: true,
-                icon: () => {
-                  return (
-                    <Add />
-                  );
-                },
-                onClick: (event, rowData) => {
-
-                }
-              }
-            ]}
-            options={{
-              actionsColumnIndex: -1
-            }}
-            data={category.categoryReducer}
-          />
-        </div>
-        <div style={{ minWidth: '35%' }}>
-          <MaterialTable
-            title='Subcategories'
-            icons={tableIcons}
-            columns={[
-              { title: 'Name', field: 'name' },
-              {
-                title: 'Expenses in Subcategory', sorting: false, type: 'numeric', render: (rowData) => {
-                  return (
-                    <p>{rowData.count}</p>
-                  );
-                }
-              },
-            ]}
-            actions={[
-              {
-                tooltip: 'Details',
-                icon: () => {
-                  return (
-                    <MoreVert />
-                  );
-                },
-                onClick: (event, rowData) => {
-                  subRowClick(rowData.name);
-                }
-              }
-            ]}
-            options={{
-              actionsColumnIndex: -1
-            }}
-            data={category.subcategoryReducer}
-          />
-        </div>
-        {toggleCategoryAddForm &&
-          // Checks state of the add category toggle to render the form or not
+            Connect to your Bank
+      </PlaidLink>}
+        {plaid.plaidError &&
+          // If plaid threw an error when trying to connect, render a plaidlink for the user to refresh their credentials
           <>
-            <h3>Add a Category</h3>
-            <form onSubmit={handleCategorySubmit} onReset={() => setToggleCategoryAddForm(false)}>
-              <label htmlFor="category-name-input">Category Name</label>
+            <p>There was an error with Plaid, please update your bank credentials.</p>
+            <PlaidLink
+              token={plaid.linkToken}
+              onSuccess={(public_token, metadata) => setTimeout(() => { dispatch({ type: 'SET_PLAID_ERROR_FALSE' }); dispatch({ type: 'FETCH_USER' }) }, 3000)}
+            >
+              Update your credentials
+          </PlaidLink>
+          </>
+        }
+        <Modal
+          style={{
+            width: '60%',
+            margin: 'auto',
+            height: '100%',
+            top: '20%',
+          }}
+          className={classes.modal}
+          disableAutoFocus={true}
+          open={toggleModal}
+          onClose={() => setToggleModal(false)}
+        >
+          <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
+            {toggleCatExpenses && <>
+              <h2>Expenses in {expense.catViewNameReducer}</h2>
               <br />
-              <input type="text" id='category-name-input' value={category.newCategoryReducer.name} onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })} required />
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expense.categoryExpenseReducer.map(categoryExpense =>
+                      <TableRow key={categoryExpense.id}>
+                        <TableCell>{categoryExpense.name}</TableCell>
+                        <TableCell>{moment(categoryExpense.date).format('MM-DD-YYYY')}</TableCell>
+                        <TableCell className={categoryExpense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(categoryExpense.amount) < 0 ? (Number(categoryExpense.amount) * -1) : Number(categoryExpense.amount))}</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
               <br />
-              <label htmlFor="necessity-false">Category of Necessities?</label>
               <br />
-              <label htmlFor="necessity-false">No</label>
-              <input type="radio" name="necessity" id="necessity-false"
-                checked={!category.newCategoryReducer.necessity}
-                onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }}
-              />
-              <label htmlFor="necessity-true">Yes</label>
-              <input type="radio" name="necessity" id="necessity-true"
-                checked={category.newCategoryReducer.necessity}
-                onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }}
-              />
+              <Button className={classes.modalButton} color='primary' variant='contained' onClick={() => { setToggleCatExpenses(false); setToggleModal(false) }}>OK</Button>
+            </>}
+            {toggleSubcatExpenses && <>
+              <h2>Expenses in {expense.subcatViewNameReducer}</h2>
+              <br />
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expense.subcategoryExpenseReducer.map(subcategoryExpense => {
+                      // Maps over the array of subcategroy expenses and checks if it is a plaid transaction or not
+                      // If the transaction is from plaid, render a table row with the transaction data
+
+                      for (const expense of expense.uncategorizedExpenseReducer) {
+                        if (expense.transaction_id === subcategoryExpense.transaction_id) {
+                          return (
+                            <TableRow key={expense.id}>
+                              <TableCell>{expense.name}</TableCell>
+                              <TableCell>{moment(expense.date).format('MM-DD-YYYY')}</TableCell>
+                              <TableCell className={expense.income ? classes.incomeAmount : classes.expenseAmount}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</TableCell>
+                            </TableRow>
+                          );
+                        };
+                      };
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <br />
+              <br />
+              <Button className={classes.modalButton} color='primary' variant='contained' onClick={() => { setToggleSubcatExpenses(false); setToggleModal(false) }}>OK</Button>
+            </>}
+            {toggleCategoryAddForm &&
+              // Checks state of the add category toggle to render the form or not
+              <>
+                <h2>Add a Category</h2>
+                <br />
+                <Paper>
+                  <form onSubmit={handleCategorySubmit} onReset={() => { setToggleModal(false); setToggleCategoryAddForm(false) }}>
+                    <br />
+                    <TextField
+                      required
+                      label='Category Name'
+                      variant='outlined'
+                      value={category.newCategoryReducer.name}
+                      onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })}
+                    />
+                    <br />
+                    <br />
+                    <FormControl>
+                      <FormLabel>Necessity?</FormLabel>
+                      <RadioGroup row value={category.newCategoryReducer.necessity}>
+                        <FormControlLabel value={false} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }} label='No' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                        <FormControlLabel value={true} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }} label='Yes' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                      </RadioGroup>
+                    </FormControl>
+                    <br />
+                    <br />
+                    <ButtonGroup>
+                      <Button variant='outlined' color='primary' type='reset'>Cancel</Button>
+                      <Button variant='contained' color='primary' className={classes.modalButton} type='submit'>Save</Button>
+                    </ButtonGroup>
+                    <br />
+                    <br />
+                  </form>
+                </Paper>
+              </>
+            }
+            <br />
+            <br />
+          </div>
+        </Modal>
+        <br />
+        <div style={{ display: 'flex', maxWidth: '91%', margin: 'auto', justifyContent: 'space-between' }}>
+          <div style={{ minWidth: '46%' }}>
+            <MaterialTable
+              title='Categories'
+              icons={tableIcons}
+              columns={[
+                { title: 'Name', field: 'name' },
+                {
+                  title: 'Necessity', sorting: false, render: (rowData) => {
+                    return (
+                      <>
+                        {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                      </>
+                    );
+                  }
+                },
+                {
+                  title: 'Expenses in Category', sorting: false, type: 'numeric', render: (rowData) => {
+                    return (
+                      <p>{rowData.count}</p>
+                    );
+                  }
+                },
+              ]}
+              actions={[
+                {
+                  tooltip: 'Details',
+                  icon: () => {
+                    return (
+                      <MoreVert />
+                    );
+                  },
+                  onClick: (event, rowData) => {
+                    mainRowClick({ name: rowData.name, id: rowData.id })
+                  }
+                },
+                {
+                  tooltip: 'Delete Category',
+                  icon: () => {
+                    return (
+                      <DeleteIcon />
+                    );
+                  },
+                  onClick: (event, rowData) => {
+                    dispatch({ type: 'DELETE_CATEGORY', payload: rowData.id });
+                  }
+                },
+                {
+                  tooltip: 'Add Category',
+                  isFreeAction: true,
+                  icon: () => {
+                    return (
+                      <Add />
+                    );
+                  },
+                  onClick: (event, rowData) => {
+                    setToggleModal(true);
+                    setToggleCategoryAddForm(true);
+                  }
+                }
+              ]}
+              options={{
+                actionsColumnIndex: -1
+              }}
+              data={category.categoryReducer}
+            />
+          </div>
+          <div style={{ minWidth: '35%' }}>
+            <MaterialTable
+              title='Subcategories'
+              icons={tableIcons}
+              columns={[
+                { title: 'Name', field: 'name' },
+                {
+                  title: 'Expenses in Subcategory', sorting: false, type: 'numeric', render: (rowData) => {
+                    return (
+                      <p>{rowData.count}</p>
+                    );
+                  }
+                },
+              ]}
+              actions={[
+                {
+                  tooltip: 'Details',
+                  icon: () => {
+                    return (
+                      <MoreVert />
+                    );
+                  },
+                  onClick: (event, rowData) => {
+                    subRowClick(rowData.name);
+                  }
+                }
+              ]}
+              options={{
+                actionsColumnIndex: -1
+              }}
+              data={category.subcategoryReducer}
+            />
+          </div>
+        </div>
+        <br />
+        <MaterialTable
+          style={{ maxWidth: '91%', margin: 'auto' }}
+          title='Uncategorized Expenses'
+          icons={tableIcons}
+          options={{
+            pageSize: 10
+          }}
+          columns={[
+            { title: 'Name', field: 'name' },
+            {
+              title: 'Date', render: (rowData) => {
+                return (
+                  <>
+                    {moment(rowData.date).format('MM-DD-YYYY')}
+                  </>
+                );
+              }
+            },
+            {
+              title: 'Category', render: (rowData) => {
+                return (
+                  <FormControl className={classes.uncategorizedFormControl}>
+                    <InputLabel id='select-label'>Select a Category</InputLabel>
+                    <Select
+                      labelId='select-label'
+                      value={''}
+                      onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: rowData.id, category_id: e.target.value } })}
+                    >
+                      {category.categoryReducer.map(category => <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>)}
+                    </Select>
+                  </FormControl>
+                )
+              }
+            },
+            {
+              title: 'Amount', type: 'currency', render: (rowData) => {
+                return (
+                  <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                    {toCurrency.format(Number(rowData.amount) < 0 ?
+                      (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                  </p>
+                );
+              }
+            },
+          ]}
+          data={expense.uncategorizedExpenseReducer}
+        />
+        {toggleExpenseAddForm &&
+          // Checks the state of the add expense toggle to render a form or not
+          <div>
+            <h3>Add an Expense</h3>
+            <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
+              <label htmlFor="expense-category-select">Expense Category</label>
+              <br />
+              <select value={expense.newExpenseReducer.category_id} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: e.target.value })} id="expense-category-select" >
+                <option value="0">Select a Category</option>
+                {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
+              </select>
+              <br />
+              <label htmlFor="expense-name-input">Expense Name</label>
+              <br />
+              <input type="text" id='expense-name-input' value={expense.newExpenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })} required />
+              <br />
+              <label htmlFor="expense-amount-input">Expense Amount</label>
+              <br />
+              <input type="number" id="expense-amount-input" value={expense.newExpenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_AMOUNT', payload: e.target.value })} required />
+              <br />
+              <label htmlFor="expense-date-input">Expense Date</label>
+              <br />
+              <input type="date" id='expense-date-input' value={expense.newExpenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_DATE', payload: e.target.value })} required />
               <br />
               <br />
               <button type='reset'>Cancel</button>
               <button type='submit'>Save</button>
             </form>
-          </>
+          </div>
+        }
+        {toggleIncomeAddForm &&
+          // Checks the state of the add expense toggle to render a form or not
+          <div>
+            <h3>Add an Income</h3>
+            <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
+              <label htmlFor="income-name-input">Income Name</label>
+              <br />
+              <input type="text" id='income-name-input' value={expense.newIncomeReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
+              <br />
+              <label htmlFor="income-amount-input">Income Amount</label>
+              <br />
+              <input type="number" id="income-amount-input" value={expense.newIncomeReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
+              <br />
+              <label htmlFor="income-date-input">Income Date</label>
+              <br />
+              <input type="date" id='income-date-input' value={expense.newIncomeReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
+              <br />
+              <br />
+              <button type='reset'>Cancel</button>
+              <button type='submit'>Save</button>
+            </form>
+          </div>
         }
       </div>
-      <br />
-      <MaterialTable
-        style={{ maxWidth: '91%', margin: 'auto' }}
-        title='Uncategorized Expenses'
-        icons={tableIcons}
-        options={{
-          pageSize: 10
-        }}
-        columns={[
-          { title: 'Name', field: 'name' },
-          {
-            title: 'Date', render: (rowData) => {
-              return (
-                <>
-                  {moment(rowData.date).format('MM-DD-YYYY')}
-                </>
-              );
-            }
-          },
-          {
-            title: 'Category', render: (rowData) => {
-              return (
-                <FormControl className={classes.uncategorizedFormControl}>
-                  <InputLabel id='select-label'>Select a Category</InputLabel>
-                  <Select
-                    labelId='select-label'
-                    value={''}
-                    onChange={e => dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { expense_id: rowData.id, category_id: e.target.value } })}
-                  >
-                    {category.categoryReducer.map(category => <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              )
-            }
-          },
-          {
-            title: 'Amount', type: 'currency', render: (rowData) => {
-              return (
-                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
-                  {toCurrency.format(Number(rowData.amount) < 0 ?
-                    (Number(rowData.amount) * -1) : Number(rowData.amount))}
-                </p>
-              );
-            }
-          },
-        ]}
-        data={expense.uncategorizedExpenseReducer}
-      />
-      {toggleExpenseAddForm &&
-        // Checks the state of the add expense toggle to render a form or not
-        <div>
-          <h3>Add an Expense</h3>
-          <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
-            <label htmlFor="expense-category-select">Expense Category</label>
-            <br />
-            <select value={expense.newExpenseReducer.category_id} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: e.target.value })} id="expense-category-select" >
-              <option value="0">Select a Category</option>
-              {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
-            </select>
-            <br />
-            <label htmlFor="expense-name-input">Expense Name</label>
-            <br />
-            <input type="text" id='expense-name-input' value={expense.newExpenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })} required />
-            <br />
-            <label htmlFor="expense-amount-input">Expense Amount</label>
-            <br />
-            <input type="number" id="expense-amount-input" value={expense.newExpenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_AMOUNT', payload: e.target.value })} required />
-            <br />
-            <label htmlFor="expense-date-input">Expense Date</label>
-            <br />
-            <input type="date" id='expense-date-input' value={expense.newExpenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_DATE', payload: e.target.value })} required />
-            <br />
-            <br />
-            <button type='reset'>Cancel</button>
-            <button type='submit'>Save</button>
-          </form>
-        </div>
-      }
-      {toggleIncomeAddForm &&
-        // Checks the state of the add expense toggle to render a form or not
-        <div>
-          <h3>Add an Income</h3>
-          <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
-            <label htmlFor="income-name-input">Income Name</label>
-            <br />
-            <input type="text" id='income-name-input' value={expense.newIncomeReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
-            <br />
-            <label htmlFor="income-amount-input">Income Amount</label>
-            <br />
-            <input type="number" id="income-amount-input" value={expense.newIncomeReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
-            <br />
-            <label htmlFor="income-date-input">Income Date</label>
-            <br />
-            <input type="date" id='income-date-input' value={expense.newIncomeReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
-            <br />
-            <br />
-            <button type='reset'>Cancel</button>
-            <button type='submit'>Save</button>
-          </form>
-        </div>
-      }
-    </div>
+    </ThemeProvider>
   );
 }
 

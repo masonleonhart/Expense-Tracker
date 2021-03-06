@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import moment from 'moment';
 
 const uncategorizedExpenseReducer = (state = [], action) => {
     // manages list of uncategorized transactions
@@ -8,7 +9,7 @@ const uncategorizedExpenseReducer = (state = [], action) => {
         default:
             return state;
     };
-}; 
+};
 
 const catViewNameReducer = (state = '', action) => {
     // manages subcategory name of list of transactions in modal
@@ -104,11 +105,17 @@ const monthlyExpenseReducer = (state = [], action) => {
     };
 };
 
-const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date: '' }, action) => {
+const newExpenseReducer = (state = { income: false, category_id: '', name: '', amount: '', date: moment().format('YYYY-MM-DD') }, action) => {
     // manages values for the new expenses inputs
     let newState = { ...state };
 
     switch (action.type) {
+        case 'SET_NEW_EXPENSE_INCOME_TRUE':
+            newState.income = true;
+            return newState;
+        case 'SET_NEW_EXPENSE_INCOME_FALSE':
+            newState.income = false;
+            return newState;
         case 'SET_NEW_EXPENSE_CATEGORY':
             newState.category_id = action.payload;
             return newState;
@@ -122,28 +129,7 @@ const newExpenseReducer = (state = { category_id: 0, name: '', amount: '', date:
             newState.date = action.payload;
             return newState;
         case 'RESET_NEW_EXPENSE_REDUCER':
-            return state = { category_id: 0, name: '', amount: '', date: '' };
-        default:
-            return state;
-    };
-};
-
-const newIncomeReducer = (state = { income: true, name: '', amount: '', date: '' }, action) => {
-    // manages values for the new income inputs
-    let newState = { ...state };
-
-    switch (action.type) {
-        case 'SET_NEW_INCOME_NAME':
-            newState.name = action.payload;
-            return newState;
-        case 'SET_NEW_INCOME_AMOUNT':
-            newState.amount = action.payload;
-            return newState;
-        case 'SET_NEW_INCOME_DATE':
-            newState.date = action.payload;
-            return newState;
-        case 'RESET_NEW_INCOME_REDUCER':
-            return state = { category_id: 0, name: '', amount: '', date: '' };
+            return state = { income: false, category_id: 0, name: '', amount: '', date: moment().format('YYYY-MM-DD') };
         default:
             return state;
     };
@@ -156,7 +142,6 @@ export default combineReducers({
     subcatViewNameReducer,
     subcategoryExpenseReducer,
     newExpenseReducer,
-    newIncomeReducer,
     currentDayReducer,
     currentMonthReducer,
     dailyExpenseReducer,

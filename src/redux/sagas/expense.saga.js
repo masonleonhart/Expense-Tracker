@@ -71,25 +71,12 @@ function* addNewExpenseSaga(action) {
     try {
         // adds a new expense to the db and refreshes the categories and uncategorized transactions lists, then
         // resets the values for the new expense form
-        yield axios.post('/api/expense/expense', action.payload);
+        yield axios.post('/api/expense', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
         yield put({ type: 'FETCH_UNCATEGORIZED' });
         yield put({ type: 'RESET_NEW_EXPENSE_REDUCER' });
     } catch (error) {
         console.log('Error in adding new expense', error);
-    };
-};
-
-function* addNewIncomeSaga(action) {
-    try {
-        // adds a new income to the db and refreshes the categories and uncategorized transactions lists, then
-        // resets the values for the new income form
-        yield axios.post('/api/expense/income', action.payload);
-        yield put({ type: 'FETCH_CATEGORIES' });
-        yield put({ type: 'FETCH_UNCATEGORIZED' });
-        yield put({ type: 'RESET_NEW_INCOME_REDUCER' });
-    } catch (error) {
-        console.log('Error in adding new income', error);
     };
 };
 
@@ -125,7 +112,6 @@ function* expenseSaga() {
     yield takeLatest('ADD_NEW_EXPENSE', addNewExpenseSaga);
     yield takeLatest('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
     yield takeLatest('DELETE_EXPENSE', deleteExpenseSaga);
-    yield takeLatest('ADD_NEW_INCOME', addNewIncomeSaga);
 };
 
 export default expenseSaga;

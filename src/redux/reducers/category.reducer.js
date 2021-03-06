@@ -55,7 +55,7 @@ const newCategoryReducer = (state = { name: '', necessity: false }, action) => {
             newState.necessity = true;
             return newState;
         case 'RESET_NEW_CATEGORY_REDUCER':
-            return state = { name: '' };
+            return state = { name: '', necessity: false };
         default:
             return state;
     };

@@ -6,11 +6,11 @@ const moment = require('moment');
 
 // POST
 
-router.post('/expense', rejectUnauthenticated, (req, res) => {
+router.post('/', rejectUnauthenticated, (req, res) => {
     // Adds a client created expense to the database
 
-    const sqlQuery = `INSERT INTO "transaction-history" ("user_id", "category_id", "name", "amount", "date")
-                        VALUES (${req.user.id}, $1, $2, $3, $4);`;
+    const sqlQuery = `INSERT INTO "transaction-history" ("user_id", "category_id", "name", "amount", "date", income)
+                        VALUES (${req.user.id}, $1, $2, $3, $4, $5);`;
 
     if (!req.body.name, !req.body.amount, !req.body.date) {
         console.log('Try again with valid fields');
@@ -18,34 +18,13 @@ router.post('/expense', rejectUnauthenticated, (req, res) => {
         return;
     };
 
-    let category_id = req.body.category_id === 0 ? null : req.body.category_id;
+    let category_id = req.body.category_id === '' ? null : req.body.category_id;
 
-    pool.query(sqlQuery, [category_id, `${req.body.name}`, Number(req.body.amount), `${req.body.date}`]).then(() => {
+    pool.query(sqlQuery, [category_id, `${req.body.name}`, Number(`${req.body.income && '-'}${req.body.amount}`), `${req.body.date}`, req.body.income]).then(() => {
         console.log('Added new expense successfully');
         res.sendStatus(201);
     }).catch(err => {
         console.log('Error in adding expense', err);
-        res.sendStatus(500);
-    });
-});
-
-router.post('/income', rejectUnauthenticated, (req, res) => {
-    // Adds a client created income to the database
-
-    const sqlQuery = `INSERT INTO "transaction-history" ("user_id", "income", "name", "amount", "date")
-                        VALUES (${req.user.id}, ${req.body.income}, $1, $2, $3);`;
-
-    if (!req.body.name, !req.body.amount, !req.body.date) {
-        console.log('Try again with valid fields');
-        res.sendStatus(400);
-        return;
-    };
-
-    pool.query(sqlQuery, [`${req.body.name}`, Number(-req.body.amount), `${req.body.date}`]).then(() => {
-        console.log('Added new income successfully');
-        res.sendStatus(201);
-    }).catch(err => {
-        console.log('Error in adding income', err);
         res.sendStatus(500);
     });
 });

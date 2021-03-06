@@ -5,6 +5,9 @@ import moment from 'moment';
 import { Button, Modal, Select, InputLabel, MenuItem, FormControl, makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 import { TextField, FormLabel, RadioGroup, Radio, FormControlLabel, ButtonGroup } from '@material-ui/core';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 
@@ -54,6 +57,7 @@ function UserPage() {
     e.preventDefault();
     dispatch({ type: 'ADD_NEW_EXPENSE', payload: expense.newExpenseReducer });
     setToggleExpenseAddForm(false);
+    setToggleModal(false);
   };
 
   const handleIncomeSubmit = e => {
@@ -88,6 +92,7 @@ function UserPage() {
     setToggleCatExpenses(false);
     setToggleSubcatExpenses(false);
     setToggleCategoryAddForm(false);
+    setToggleExpenseAddForm(false);
   };
 
   const theme = createMuiTheme({
@@ -113,6 +118,9 @@ function UserPage() {
     },
     modalButton: {
       color: 'white'
+    },
+    selectOutlinedFormControl: {
+      minWidth: 170
     }
   });
 
@@ -133,7 +141,8 @@ function UserPage() {
       <div className="container">
         <Modal
           style={{
-            width: '60%',
+            width: '40%',
+            maxWidth: '60%',
             margin: 'auto',
             height: '100%',
             top: '20%',
@@ -143,7 +152,7 @@ function UserPage() {
           open={toggleModal}
           onClose={handleModalClose}
         >
-          <div style={{ backgroundColor: 'white', textAlign: 'center', height: '70%', overflowY: 'auto' }}>
+          <div style={{ backgroundColor: 'white', textAlign: 'center', height: '80%', overflowY: 'auto', borderRadius: '2%' }}>
             {toggleCatExpenses && <>
               <h2>Expenses in {expense.catViewNameReducer}</h2>
               <br />
@@ -212,36 +221,105 @@ function UserPage() {
               <>
                 <h2>Add a Category</h2>
                 <br />
-                <Paper>
-                  <form onSubmit={handleCategorySubmit} onReset={() => { setToggleModal(false); setToggleCategoryAddForm(false) }}>
-                    <br />
-                    <TextField
-                      required
-                      label='Category Name'
-                      variant='outlined'
-                      value={category.newCategoryReducer.name}
-                      onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })}
-                    />
-                    <br />
-                    <br />
-                    <FormControl>
-                      <FormLabel>Necessity?</FormLabel>
-                      <RadioGroup row value={category.newCategoryReducer.necessity}>
-                        <FormControlLabel value={false} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }} label='No' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
-                        <FormControlLabel value={true} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }} label='Yes' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
-                      </RadioGroup>
-                    </FormControl>
-                    <br />
-                    <br />
-                    <ButtonGroup>
-                      <Button variant='outlined' color='primary' type='reset'>Cancel</Button>
-                      <Button variant='contained' color='primary' className={classes.modalButton} type='submit'>Save</Button>
-                    </ButtonGroup>
-                    <br />
-                    <br />
-                  </form>
-                </Paper>
+                <form onSubmit={handleCategorySubmit} onReset={() => { setToggleModal(false); setToggleCategoryAddForm(false) }}>
+                  <br />
+                  <TextField
+                    required
+                    label='Category Name'
+                    variant='outlined'
+                    value={category.newCategoryReducer.name}
+                    onChange={e => dispatch({ type: 'SET_NEW_CATEGORY_NAME', payload: e.target.value })}
+                  />
+                  <br />
+                  <br />
+                  <br />
+                  <FormControl>
+                    <FormLabel>Necessity?</FormLabel>
+                    <RadioGroup row value={category.newCategoryReducer.necessity}>
+                      <FormControlLabel value={false} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_FALSE' }) }} label='No' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                      <FormControlLabel value={true} onChange={e => { dispatch({ type: 'SET_NEW_CATEGORY_NECESSITY_TRUE' }) }} label='Yes' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                    </RadioGroup>
+                  </FormControl>
+                  <br />
+                  <br />
+                  <br />
+                  <br />
+                  <ButtonGroup>
+                    <Button variant='outlined' color='primary' type='reset'>Cancel</Button>
+                    <Button variant='contained' color='primary' className={classes.modalButton} type='submit'>Save</Button>
+                  </ButtonGroup>
+                </form>
               </>
+            }
+            {toggleExpenseAddForm &&
+              // Checks the state of the add expense toggle to render a form or not
+              <div>
+                <h3>Add a Transaction</h3>
+                <br />
+                <form onSubmit={handleExpenseSubmit} onReset={() => { setToggleModal(false); setToggleExpenseAddForm(false) }}>
+                  <FormControl>
+                    <FormLabel>Type of Transaction</FormLabel>
+                    <RadioGroup row value={expense.newExpenseReducer.income}>
+                      <FormControlLabel value={false} onChange={e => { dispatch({ type: 'SET_NEW_EXPENSE_INCOME_FALSE' }) }} label='Expense' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                      <FormControlLabel value={true} onChange={e => { dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: '' }); dispatch({ type: 'SET_NEW_EXPENSE_INCOME_TRUE' }) }} label='Income' labelPlacement='top' control={<Radio color='primary' />}></FormControlLabel>
+                    </RadioGroup>
+                  </FormControl>
+                  <br />
+                  <br />
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                      required
+                      disableToolbar
+                      disableFuture
+                      variant='inline'
+                      format='yyyy-MM-dd'
+                      label='Transaction Date'
+                      value={moment(expense.newExpenseReducer.date)}
+                      onChange={date => dispatch({ type: 'SET_NEW_EXPENSE_DATE', payload: moment(date).format('YYYY-MM-DD') })}
+                    />
+                  </MuiPickersUtilsProvider>
+                  <br />
+                  <br />
+                  {!expense.newExpenseReducer.income &&
+                    <FormControl variant='outlined' className={classes.selectOutlinedFormControl}>
+                      <InputLabel id='add-expense-label'>Select a Category</InputLabel>
+                      <Select
+                        labelId='add-expense-label'
+                        label='Select a Category'
+                        value={expense.newExpenseReducer.category_id}
+                        onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: e.target.value })}
+                      >
+                        {category.categoryReducer.map(category => <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>)}
+                      </Select>
+                    </FormControl>}
+                  <br />
+                  <br />
+                  <TextField
+                    required
+                    label='Transaction Name'
+                    variant='outlined'
+                    value={expense.newExpenseReducer.name}
+                    onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })}
+                  />
+                  <br />
+                  <br />
+                  <TextField
+                    required
+                    type='number'
+                    label='Transaction Amount'
+                    variant='outlined'
+                    value={expense.newExpenseReducer.amount}
+                    onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_AMOUNT', payload: e.target.value })}
+                  />
+                  <br />
+                  <br />
+                  <ButtonGroup>
+                    <Button variant='outlined' color='primary' type='reset'>Cancel</Button>
+                    <Button variant='contained' color='primary' className={classes.modalButton} type='submit'>Save</Button>
+                  </ButtonGroup>
+                </form>
+
+              </div>
             }
             <br />
             <br />
@@ -395,61 +473,23 @@ function UserPage() {
               }
             },
           ]}
+          actions={[
+            {
+              tooltip: 'Add Transaction',
+              isFreeAction: true,
+              icon: () => {
+                return (
+                  <Add />
+                );
+              },
+              onClick: (event, rowData) => {
+                setToggleModal(true);
+                setToggleExpenseAddForm(true);
+              }
+            }
+          ]}
           data={expense.uncategorizedExpenseReducer}
         />
-        {toggleExpenseAddForm &&
-          // Checks the state of the add expense toggle to render a form or not
-          <div>
-            <h3>Add an Expense</h3>
-            <form onSubmit={handleExpenseSubmit} onReset={() => setToggleExpenseAddForm(false)}>
-              <label htmlFor="expense-category-select">Expense Category</label>
-              <br />
-              <select value={expense.newExpenseReducer.category_id} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_CATEGORY', payload: e.target.value })} id="expense-category-select" >
-                <option value="0">Select a Category</option>
-                {category.categoryReducer.map(category => <option value={category.id} key={category.id}>{category.name}</option>)}
-              </select>
-              <br />
-              <label htmlFor="expense-name-input">Expense Name</label>
-              <br />
-              <input type="text" id='expense-name-input' value={expense.newExpenseReducer.name} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_NAME', payload: e.target.value })} required />
-              <br />
-              <label htmlFor="expense-amount-input">Expense Amount</label>
-              <br />
-              <input type="number" id="expense-amount-input" value={expense.newExpenseReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_AMOUNT', payload: e.target.value })} required />
-              <br />
-              <label htmlFor="expense-date-input">Expense Date</label>
-              <br />
-              <input type="date" id='expense-date-input' value={expense.newExpenseReducer.date} onChange={e => dispatch({ type: 'SET_NEW_EXPENSE_DATE', payload: e.target.value })} required />
-              <br />
-              <br />
-              <button type='reset'>Cancel</button>
-              <button type='submit'>Save</button>
-            </form>
-          </div>
-        }
-        {toggleIncomeAddForm &&
-          // Checks the state of the add expense toggle to render a form or not
-          <div>
-            <h3>Add an Income</h3>
-            <form onSubmit={handleIncomeSubmit} onReset={() => setToggleIncomeAddForm(false)}>
-              <label htmlFor="income-name-input">Income Name</label>
-              <br />
-              <input type="text" id='income-name-input' value={expense.newIncomeReducer.name} onChange={e => dispatch({ type: 'SET_NEW_INCOME_NAME', payload: e.target.value })} required />
-              <br />
-              <label htmlFor="income-amount-input">Income Amount</label>
-              <br />
-              <input type="number" id="income-amount-input" value={expense.newIncomeReducer.amount} onChange={e => dispatch({ type: 'SET_NEW_INCOME_AMOUNT', payload: e.target.value })} required />
-              <br />
-              <label htmlFor="income-date-input">Income Date</label>
-              <br />
-              <input type="date" id='income-date-input' value={expense.newIncomeReducer.date} onChange={e => dispatch({ type: 'SET_NEW_INCOME_DATE', payload: e.target.value })} required />
-              <br />
-              <br />
-              <button type='reset'>Cancel</button>
-              <button type='submit'>Save</button>
-            </form>
-          </div>
-        }
       </div>
     </ThemeProvider>
   );

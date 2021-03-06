@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { Paper } from '@material-ui/core';
+
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
 
@@ -59,32 +61,36 @@ function MonthPage() {
     return (
         <div className='container'>
             <br />
-            <Calendar
-                calendarType='US'
-                tileContent={renderSum}
-                minDetail='month'
-                nextLabel={<p className='nav-tile' onClick={() => handleClick(1)}>›</p>}
-                prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
-                tileClassName='calendar-tile'
-                showNeighboringMonth={false}
-                maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
-                defaultActiveStartDate={new Date(
-                    (Number(moment().add(currentMonth, 'months').format('YYYY'))),
-                    (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
-                    (Number(moment().add(currentMonth, 'months').format('DD'))),
-                )}
-                onClickDay={(value) => {
-                    // Allows a user to click a calendar day to navigate to the day page of the day that was clicked
+            <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
+                <br />
+                <Calendar
+                    calendarType='US'
+                    tileContent={renderSum}
+                    minDetail='month'
+                    nextLabel={<p className='nav-tile' onClick={() => handleClick(1)}>›</p>}
+                    prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
+                    tileClassName='calendar-tile'
+                    showNeighboringMonth={false}
+                    maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
+                    defaultActiveStartDate={new Date(
+                        (Number(moment().add(currentMonth, 'months').format('YYYY'))),
+                        (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
+                        (Number(moment().add(currentMonth, 'months').format('DD'))),
+                    )}
+                    onClickDay={(value) => {
+                        // Allows a user to click a calendar day to navigate to the day page of the day that was clicked
 
-                    let clickedDay = moment(value).startOf('day');
-                    let currentDay = moment().startOf('day');
-                    let difference = clickedDay.diff(currentDay, 'days')
+                        let clickedDay = moment(value).startOf('day');
+                        let currentDay = moment().startOf('day');
+                        let difference = clickedDay.diff(currentDay, 'days')
 
-                    dispatch({ type: 'GO_TO_DAY', payload: difference });
-                    history.push('/day');
-                }}
-            >
-            </Calendar>
+                        dispatch({ type: 'GO_TO_DAY', payload: difference });
+                        history.push('/day');
+                    }}
+                >
+                </Calendar>
+                <br />
+            </Paper>
             <br />
             <br />
             <MaterialTable

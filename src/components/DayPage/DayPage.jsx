@@ -3,7 +3,7 @@ import moment from 'moment';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Paper } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 
 import MaterialTable from 'material-table';
@@ -32,7 +32,8 @@ function InfoPage() {
     },
     dayNav: {
       minHeight: '64px',
-      borderRadius: '50%'
+      borderRadius: '50%',
+      margin: '0 5px 0 5px'
     }
   });
 
@@ -54,28 +55,33 @@ function InfoPage() {
 
   return (
     <div className="container" style={{ textAlign: 'center' }}>
-      <Button onClick={() => {
-        // Lets you navigate to the month page of the displayed month if the user clicks on the h1
-
-        let clickedMonth = moment().add(currentDay, 'days').startOf('month');
-        let currentMonth = moment().startOf('month');
-        let difference = clickedMonth.diff(currentMonth, 'months')
-
-        dispatch({ type: 'GO_TO_MONTH', payload: difference });
-        history.push('/month');
-      }}><h1>{moment().add(currentDay, 'days').format('MMMM')}</h1></Button>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '40%' }}>
-          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(-1)}><h1 style={{ margin: '0' }}>‹</h1></Button>
-          <Button className={classes.dayNav} onClick={() => handleClick(-2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 2, 'days').format('DD')}</h4></Button>
-          <Button className={classes.dayNav} onClick={() => handleClick(-1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 1, 'days').format('DD')}</h4></Button>
-          <h2 style={{ margin: '0', userSelect: 'none' }}>{moment().add(currentDay, 'days').format('DD')}</h2>
-          <Button className={classes.dayNav} onClick={() => handleClick(1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 1, 'days').format('DD')}</h4></Button>
-          <Button className={classes.dayNav} onClick={() => handleClick(2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 2, 'days').format('DD')}</h4></Button>
-          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(1)}><h1 style={{ margin: '0' }}>›</h1></Button>
-        </div>
-      </div>
       <br />
+      <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
+        <div style={{ margin: '0 15px 0 15px' }}>
+          <Button onClick={() => {
+            // Lets you navigate to the month page of the displayed month if the user clicks on the h1
+
+            let clickedMonth = moment().add(currentDay, 'days').startOf('month');
+            let currentMonth = moment().startOf('month');
+            let difference = clickedMonth.diff(currentMonth, 'months')
+
+            dispatch({ type: 'GO_TO_MONTH', payload: difference });
+            history.push('/month');
+          }}><h1>{moment().add(currentDay, 'days').format('MMMM')}</h1></Button>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '40%' }}>
+              <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(-1)}><h1 style={{ margin: '0' }}>‹</h1></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(-2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 2, 'days').format('DD')}</h4></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(-1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 1, 'days').format('DD')}</h4></Button>
+              <h2 style={{ margin: '0 5px 0 5px', userSelect: 'none' }}>{moment().add(currentDay, 'days').format('DD')}</h2>
+              <Button className={classes.dayNav} onClick={() => handleClick(1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 1, 'days').format('DD')}</h4></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 2, 'days').format('DD')}</h4></Button>
+              <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(1)}><h1 style={{ margin: '0' }}>›</h1></Button>
+            </div>
+          </div>
+          <br />
+        </div>
+      </Paper>
       <br />
       <br />
       <MaterialTable

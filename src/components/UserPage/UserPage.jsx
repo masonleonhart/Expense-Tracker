@@ -29,7 +29,6 @@ function UserPage() {
   const [toggleSubcatExpenses, setToggleSubcatExpenses] = useState(false);
   const [toggleCatExpenses, setToggleCatExpenses] = useState(false);
   const [toggleExpenseAddForm, setToggleExpenseAddForm] = useState(false);
-  const [toggleIncomeAddForm, setToggleIncomeAddForm] = useState(false);
   const [toggleCategoryAddForm, setToggleCategoryAddForm] = useState(false);
   const [toggleModal, setToggleModal] = useState(false);
 
@@ -58,15 +57,6 @@ function UserPage() {
     dispatch({ type: 'ADD_NEW_EXPENSE', payload: expense.newExpenseReducer });
     setToggleExpenseAddForm(false);
     setToggleModal(false);
-  };
-
-  const handleIncomeSubmit = e => {
-    // Function to handle the submit of adding a new income, prevent page reload, add new income to database,
-    // and set the view of the form to false
-
-    e.preventDefault();
-    dispatch({ type: 'ADD_NEW_INCOME', payload: expense.newIncomeReducer });
-    setToggleIncomeAddForm(false);
   };
 
   const mainRowClick = obj => {

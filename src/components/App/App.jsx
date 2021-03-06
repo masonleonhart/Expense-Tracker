@@ -15,7 +15,6 @@ import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 
 import UserPage from '../UserPage/UserPage';
 import InfoPage from '../DayPage/DayPage';
-import LandingPage from '../LandingPage/LandingPage';
 import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
 import MonthPage from '../MonthPage/MonthPage';
@@ -101,7 +100,7 @@ function App() {
               path="/home"
               authRedirect="/user"
             >
-              <LandingPage />
+              <LoginPage />
             </ProtectedRoute>
 
             {/* If none of the other routes matched, we will show a 404. */}

@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Button, TextField, makeStyles } from '@material-ui/core';
+
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+
 function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -19,42 +24,53 @@ function RegisterForm() {
     });
   }; // end registerUser
 
+  const theme = createMuiTheme({
+    palette: {
+      primary: {
+        main: '#4CBB17'
+      }
+    }
+  });
+
+  const useStyles = makeStyles({
+    button: {
+      color: 'white'
+    }
+  });
+
+  const classes = useStyles();
+
   return (
-    <form className="formPanel" onSubmit={registerUser}>
-      <h2>Register User</h2>
-      {errors.registrationMessage && (
-        <h3 className="alert" role="alert">
-          {errors.registrationMessage}
-        </h3>
-      )}
-      <div>
-        <label htmlFor="username">
-          Username:
-          <input
-            type="text"
-            name="username"
-            value={username}
-            required
-            onChange={(event) => setUsername(event.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label htmlFor="password">
-          Password:
-          <input
-            type="password"
-            name="password"
-            value={password}
-            required
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <input className="btn" type="submit" name="submit" value="Register" />
-      </div>
-    </form>
+    <ThemeProvider theme={theme}>
+      <form className="formPanel" onSubmit={registerUser}>
+        <h2>Register User</h2>
+        {errors.registrationMessage && (
+          <h3 className="alert" role="alert">
+            {errors.registrationMessage}
+          </h3>
+        )}
+        <TextField
+          required
+          label='Username'
+          variant='outlined'
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <br />
+        <br />
+        <TextField
+          required
+          type='password'
+          label='Password'
+          variant='outlined'
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <br />
+        <br />
+        <Button type='submit' className={classes.button} variant='contained' color='primary'>Log In</Button>
+      </form>
+    </ThemeProvider>
   );
 }
 

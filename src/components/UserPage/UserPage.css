@@ -3,11 +3,11 @@ table {
 }
 
 .income-amount {
-    background-color: rgba(0, 255, 0, 0.404);
+    color: green;
 }
 
 .expense-amount {
-    background-color: rgba(255, 0, 0, 0.404);
+    color: red;
 }
 
 .subcategory-row {

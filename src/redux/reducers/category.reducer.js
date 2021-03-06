@@ -40,7 +40,7 @@ const monthlyCategoryReducer = (state = [], action) => {
     };
 };
 
-const newCategoryReducer = (state = { name: '' }, action) => {
+const newCategoryReducer = (state = { name: '', necessity: false }, action) => {
     // manages value for new category input
     let newState = { ...state };
 
@@ -48,8 +48,14 @@ const newCategoryReducer = (state = { name: '' }, action) => {
         case 'SET_NEW_CATEGORY_NAME':
             newState.name = action.payload;
             return newState;
+        case 'SET_NEW_CATEGORY_NECESSITY_FALSE':
+            newState.necessity = false;
+            return newState;
+        case 'SET_NEW_CATEGORY_NECESSITY_TRUE':
+            newState.necessity = true;
+            return newState;
         case 'RESET_NEW_CATEGORY_REDUCER':
-            return state = { name: '' };
+            return state = { name: '', necessity: false };
         default:
             return state;
     };

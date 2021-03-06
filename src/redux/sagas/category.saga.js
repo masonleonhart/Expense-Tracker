@@ -25,6 +25,7 @@ function* fetchDailyCategoriesSaga(action) {
     // fetches all of the categories in the specified day and sends them to the daily categories reducer
     try {
         const response = yield axios.get(`/api/category/daily/${action.payload}`);
+        console.log(response)
         yield put({ type: 'SET_DAILY_CATEGORIES', payload: response.data });
     } catch (error) {
         console.log('Error in fetching daily categories', error);

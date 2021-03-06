@@ -11,6 +11,16 @@ function* fetchUncategorizedSaga() {
     };
 };
 
+function* fetchCatTransactionsSaga(action) {
+    try {
+        yield put({ type: 'SET_CAT_VIEW_NAME', payload: action.payload.name });
+        const response = yield axios.get(`/api/expense/category/transactions/${action.payload.id}`);
+        yield put({ type: 'SET_CAT_TRANSACTIONS', payload: response.data });
+    } catch (error) {
+        console.log('Error in fetching category transactions', error);
+    }
+};
+
 function* fetchSubcatTransactionsSaga(action) {
     // sets the subcategory view name for the modal, fetches all transactions in that subcategory and sends them to the 
     // subcategory transaction reducer
@@ -61,25 +71,12 @@ function* addNewExpenseSaga(action) {
     try {
         // adds a new expense to the db and refreshes the categories and uncategorized transactions lists, then
         // resets the values for the new expense form
-        yield axios.post('/api/expense/expense', action.payload);
+        yield axios.post('/api/expense', action.payload);
         yield put({ type: 'FETCH_CATEGORIES' });
         yield put({ type: 'FETCH_UNCATEGORIZED' });
         yield put({ type: 'RESET_NEW_EXPENSE_REDUCER' });
     } catch (error) {
         console.log('Error in adding new expense', error);
-    };
-};
-
-function* addNewIncomeSaga(action) {
-    try {
-        // adds a new income to the db and refreshes the categories and uncategorized transactions lists, then
-        // resets the values for the new income form
-        yield axios.post('/api/expense/income', action.payload);
-        yield put({ type: 'FETCH_CATEGORIES' });
-        yield put({ type: 'FETCH_UNCATEGORIZED' });
-        yield put({ type: 'RESET_NEW_INCOME_REDUCER' });
-    } catch (error) {
-        console.log('Error in adding new income', error);
     };
 };
 
@@ -107,6 +104,7 @@ function* deleteExpenseSaga(action) {
 
 function* expenseSaga() {
     yield takeLatest('FETCH_UNCATEGORIZED', fetchUncategorizedSaga);
+    yield takeLatest('FETCH_CAT_TRANSACTIONS', fetchCatTransactionsSaga);
     yield takeLatest('FETCH_SUBCAT_TRANSACTIONS', fetchSubcatTransactionsSaga);
     yield takeLatest('FETCH_DAILY_EXPENSES', fetchDailyExpensesSaga);
     yield takeLatest('FETCH_DAILY_SUMS', fetchDailySumsSaga);
@@ -114,7 +112,6 @@ function* expenseSaga() {
     yield takeLatest('ADD_NEW_EXPENSE', addNewExpenseSaga);
     yield takeLatest('UPDATE_EXPENSE_CATEGORY', updateExpenseCategorySaga);
     yield takeLatest('DELETE_EXPENSE', deleteExpenseSaga);
-    yield takeLatest('ADD_NEW_INCOME', addNewIncomeSaga);
 };
 
 export default expenseSaga;

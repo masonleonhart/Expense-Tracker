@@ -3,8 +3,11 @@ import moment from 'moment';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Paper } from '@material-ui/core';
 import { Button } from '@material-ui/core';
+
+import MaterialTable from 'material-table';
+import tableIcons from '../../hooks/materialTableIcons';
 
 import './DayPage.css';
 
@@ -29,7 +32,8 @@ function InfoPage() {
     },
     dayNav: {
       minHeight: '64px',
-      borderRadius: '50%'
+      borderRadius: '50%',
+      margin: '0 5px 0 5px'
     }
   });
 
@@ -51,71 +55,85 @@ function InfoPage() {
 
   return (
     <div className="container" style={{ textAlign: 'center' }}>
-      <Button onClick={() => {
-        // Lets you navigate to the month page of the displayed month if the user clicks on the h1
+      <br />
+      <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
+        <div style={{ margin: '0 15px 0 15px' }}>
+          <Button onClick={() => {
+            // Lets you navigate to the month page of the displayed month if the user clicks on the h1
 
-        let clickedMonth = moment().add(currentDay, 'days').startOf('month');
-        let currentMonth = moment().startOf('month');
-        let difference = clickedMonth.diff(currentMonth, 'months')
+            let clickedMonth = moment().add(currentDay, 'days').startOf('month');
+            let currentMonth = moment().startOf('month');
+            let difference = clickedMonth.diff(currentMonth, 'months')
 
-        dispatch({ type: 'GO_TO_MONTH', payload: difference });
-        history.push('/month');
-      }}><h1>{moment().add(currentDay, 'days').format('MMMM')}</h1></Button>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '40%' }}>
-          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(-1)}><h1 style={{ margin: '0' }}>‹</h1></Button>
-          <Button  className={classes.dayNav} onClick={() => handleClick(-2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 2, 'days').format('DD')}</h4></Button>
-          <Button  className={classes.dayNav} onClick={() => handleClick(-1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 1, 'days').format('DD')}</h4></Button>
-          <h2 style={{ margin: '0', userSelect: 'none' }}>{moment().add(currentDay, 'days').format('DD')}</h2>
-          <Button  className={classes.dayNav} onClick={() => handleClick(1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 1, 'days').format('DD')}</h4></Button>
-          <Button  className={classes.dayNav} onClick={() => handleClick(2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 2, 'days').format('DD')}</h4></Button>
-          <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(1)}><h1 style={{ margin: '0' }}>›</h1></Button>
+            dispatch({ type: 'GO_TO_MONTH', payload: difference });
+            history.push('/month');
+          }}><h1>{moment().add(currentDay, 'days').format('MMMM')}</h1></Button>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '40%' }}>
+              <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(-1)}><h1 style={{ margin: '0' }}>‹</h1></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(-2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 2, 'days').format('DD')}</h4></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(-1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay - 1, 'days').format('DD')}</h4></Button>
+              <h2 style={{ margin: '0 5px 0 5px', userSelect: 'none' }}>{moment().add(currentDay, 'days').format('DD')}</h2>
+              <Button className={classes.dayNav} onClick={() => handleClick(1)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 1, 'days').format('DD')}</h4></Button>
+              <Button className={classes.dayNav} onClick={() => handleClick(2)}><h4 style={{ margin: '0' }}>{moment().add(currentDay + 2, 'days').format('DD')}</h4></Button>
+              <Button variant='outlined' className={classes.arrowNav} onClick={() => handleClick(1)}><h1 style={{ margin: '0' }}>›</h1></Button>
+            </div>
+          </div>
+          <br />
         </div>
-      </div>
+      </Paper>
       <br />
       <br />
+      <MaterialTable
+        style={{ maxWidth: '80%', margin: 'auto' }}
+        title='Categories'
+        icons={tableIcons}
+        columns={[
+          { title: 'Name', field: 'name' },
+          {
+            title: 'Category of Necessities', render: (rowData) => {
+              return (
+                <>
+                  {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                </>
+              );
+            }
+          },
+          { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
+        ]}
+        data={category.dailyCategoryReducer}
+      />
       <br />
-      <table style={{ margin: 'auto' }}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Total Spent in Category</th>
-          </tr>
-        </thead>
-        <tbody>
-          {category.dailyCategoryReducer.map(category =>
-            // Creates a table row for each item inside the list of daily categoreis
-            <tr key={category.id}>
-              <td>{category.name}</td>
-              <td>{toCurrency.format(category.sum)}</td>
-            </tr>)}
-        </tbody>
-      </table >
       <br />
-      <br />
-      <table style={{ margin: 'auto' }}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Category</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expense.dailyExpenseReducer.map(expense =>
-            // Creates a table row for each item inside the list of daily expenses
-
-            <tr key={expense.id}>
-              <td>{expense.name}</td>
-              {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
-              is positive, give the expense class to highlight red */}
-              <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-              <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-              <td>{expense.category_name}</td>
-            </tr>)}
-        </tbody>
-      </table>
+      <MaterialTable
+        style={{ maxWidth: '80%', margin: 'auto' }}
+        title='Transactions'
+        icons={tableIcons}
+        columns={[
+          { title: 'Name', field: 'name' },
+          {
+            title: 'Date', render: (rowData) => {
+              return (
+                <>
+                  {moment(rowData.date).format('MM-DD-YYYY')}
+                </>
+              );
+            }
+          },
+          { title: 'Category', field: 'category_name' },
+          {
+            title: 'Amount', type: 'currency', render: (rowData) => {
+              return (
+                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                  {toCurrency.format(Number(rowData.amount) < 0 ?
+                    (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                </p>
+              );
+            }
+          },
+        ]}
+        data={expense.dailyExpenseReducer}
+      />
     </div>
   );
 };

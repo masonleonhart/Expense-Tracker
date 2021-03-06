@@ -4,6 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { Paper } from '@material-ui/core';
+
+import MaterialTable from 'material-table';
+import tableIcons from '../../hooks/materialTableIcons';
+
 import 'react-calendar/dist/Calendar.css';
 import './MonthPage.css'
 
@@ -56,76 +61,88 @@ function MonthPage() {
     return (
         <div className='container'>
             <br />
-            <Calendar
-                calendarType='US'
-                tileContent={renderSum}
-                minDetail='month'
-                nextLabel={<p className='nav-tile' onClick={() => handleClick(1)}>›</p>}
-                prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
-                tileClassName='calendar-tile'
-                showNeighboringMonth={false}
-                maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
-                defaultActiveStartDate={new Date(
-                    (Number(moment().add(currentMonth, 'months').format('YYYY'))),
-                    (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
-                    (Number(moment().add(currentMonth, 'months').format('DD'))),
-                )}
-                onClickDay={(value) => {
-                    // Allows a user to click a calendar day to navigate to the day page of the day that was clicked
+            <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
+                <br />
+                <Calendar
+                    calendarType='US'
+                    tileContent={renderSum}
+                    minDetail='month'
+                    nextLabel={<p className='nav-tile' onClick={() => handleClick(1)}>›</p>}
+                    prevLabel={<p className='nav-tile' onClick={({ date }) => handleClick(-1, date)}>‹</p>}
+                    tileClassName='calendar-tile'
+                    showNeighboringMonth={false}
+                    maxDate={new Date(moment().endOf('month').add(1, 'day').format('YYYY-MM-DD'))}
+                    defaultActiveStartDate={new Date(
+                        (Number(moment().add(currentMonth, 'months').format('YYYY'))),
+                        (Number(moment().add(currentMonth, 'months').format('MM'))) - 1,
+                        (Number(moment().add(currentMonth, 'months').format('DD'))),
+                    )}
+                    onClickDay={(value) => {
+                        // Allows a user to click a calendar day to navigate to the day page of the day that was clicked
 
-                    let clickedDay = moment(value).startOf('day');
-                    let currentDay = moment().startOf('day');
-                    let difference = clickedDay.diff(currentDay, 'days')
+                        let clickedDay = moment(value).startOf('day');
+                        let currentDay = moment().startOf('day');
+                        let difference = clickedDay.diff(currentDay, 'days')
 
-                    dispatch({ type: 'GO_TO_DAY', payload: difference });
-                    history.push('/day');
-                }}
-            >
-            </Calendar>
+                        dispatch({ type: 'GO_TO_DAY', payload: difference });
+                        history.push('/day');
+                    }}
+                >
+                </Calendar>
+                <br />
+            </Paper>
             <br />
             <br />
-            <table style={{ margin: 'auto' }}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Total Spent in Category</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {category.monthlyCategoryReducer.map(category =>
-                        // Creates a table row for each category in the array of monthly categories
-
-                        <tr key={category.id}>
-                            <td>{category.name}</td>
-                            <td>{toCurrency.format(category.sum)}</td>
-                        </tr>)}
-                </tbody>
-            </table >
+            <MaterialTable
+                style={{ maxWidth: '80%', margin: 'auto' }}
+                title='Categories'
+                icons={tableIcons}
+                columns={[
+                    { title: 'Name', field: 'name' },
+                    {
+                        title: 'Category of Necessities', render: (rowData) => {
+                            return (
+                                <>
+                                    {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                                </>
+                            );
+                        }
+                    },
+                    { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
+                ]}
+                data={category.monthlyCategoryReducer}
+            />
             <br />
             <br />
-            <table style={{ margin: 'auto' }}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Category</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {expense.monthlyExpenseReducer.map(expense =>
-                        // Creates a table row for each expense in the array of monthly expenses
-
-                        <tr key={expense.id}>
-                            <td>{expense.name}</td>
-                            {/* if a negative amount, remove the negative and give the income class to highlight green If the amount
-                         is positive, give the expense class to highlight red */}
-                            <td className={expense.income ? 'income-amount' : 'expense-amount'}>{toCurrency.format(Number(expense.amount) < 0 ? (Number(expense.amount) * -1) : Number(expense.amount))}</td>
-                            <td>{moment(expense.date).format('YYYY-MM-DD')}</td>
-                            <td>{expense.category_name}</td>
-                        </tr>)}
-                </tbody>
-            </table>
+            <MaterialTable
+                style={{ maxWidth: '80%', margin: 'auto' }}
+                title='Transactions'
+                icons={tableIcons}
+                columns={[
+                    { title: 'Name', field: 'name' },
+                    {
+                        title: 'Date', render: (rowData) => {
+                            return (
+                                <>
+                                    {moment(rowData.date).format('MM-DD-YYYY')}
+                                </>
+                            );
+                        }
+                    },
+                    { title: 'Category', field: 'category_name' },
+                    {
+                        title: 'Amount', type: 'currency', render: (rowData) => {
+                            return (
+                                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                                    {toCurrency.format(Number(rowData.amount) < 0 ?
+                                        (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                                </p>
+                            );
+                        }
+                    },
+                ]}
+                data={expense.monthlyExpenseReducer}
+            />
         </div>
     );
 };

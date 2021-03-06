@@ -14,24 +14,25 @@ CREATE TABLE "user" (
 CREATE TABLE "category" (
     "id" SERIAL PRIMARY KEY,
     "user_id" INTEGER REFERENCES "user" NOT NULL,
-    "name" VARCHAR(100) NOT NULL
+    "name" VARCHAR(100) NOT NULL,
+    "necessity" BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE "expense" (
-	"id" SERIAL NOT NULL,
+CREATE TABLE "subcategory" (
+	"id" SERIAL PRIMARY KEY,
 	"user_id" INTEGER REFERENCES "user" NOT NULL,
-    "category_id" INTEGER REFERENCES "categories" DEFAULT NULL,
 	"name" VARCHAR(100) NOT NULL,
-	"amount" DECIMAL(100, 2) NOT NULL,
-	"date" VARCHAR(30) NOT NULL,
-	"transaction_id" VARCHAR(100) UNIQUE DEFAULT NULL
+	"transaction_id" VARCHAR(100) NOT NULL,
+	"date" DATE NOT NULL
 );
 
-CREATE TABLE "income" (
-	"id" SERIAL NOT NULL,
+CREATE TABLE "transaction-history" (
+	"id" SERIAL PRIMARY KEY,
 	"user_id" INTEGER REFERENCES "user" NOT NULL,
+    "category_id" INTEGER REFERENCES "category" ON DELETE SET NULL,
 	"name" VARCHAR(100) NOT NULL,
 	"amount" DECIMAL(100, 2) NOT NULL,
-	"date" VARCHAR(30) NOT NULL,
-	"transaction_id" VARCHAR(100) DEFAULT NULL
+	"date" DATE NOT NULL,
+	"transaction_id" VARCHAR(100) UNIQUE DEFAULT NULL,
+	"income" BOOLEAN DEFAULT FALSE
 );

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Paper } from '@material-ui/core';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
@@ -15,6 +16,7 @@ import './MonthPage.css'
 function MonthPage() {
     const dispatch = useDispatch();
     const history = useHistory();
+    const matches = useMediaQuery('(max-width:820px)');
     const currentMonth = useSelector(store => store.expense.currentMonthReducer); // Accesses the current month that is stored inside of the expense reducer
     const expense = useSelector(store => store.expense); // Acccess the expense store
     const category = useSelector(store => store.category);  // Access the category store
@@ -93,56 +95,61 @@ function MonthPage() {
             </Paper>
             <br />
             <br />
-            <MaterialTable
-                style={{ maxWidth: '80%', margin: 'auto' }}
-                title='Categories'
-                icons={tableIcons}
-                columns={[
-                    { title: 'Name', field: 'name' },
-                    {
-                        title: 'Category of Necessities', render: (rowData) => {
-                            return (
-                                <>
-                                    {rowData.necessity ? <p>Yes</p> : <p>No</p>}
-                                </>
-                            );
-                        }
-                    },
-                    { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
-                ]}
-                data={category.monthlyCategoryReducer}
-            />
-            <br />
-            <br />
-            <MaterialTable
-                style={{ maxWidth: '80%', margin: 'auto' }}
-                title='Transactions'
-                icons={tableIcons}
-                columns={[
-                    { title: 'Name', field: 'name' },
-                    {
-                        title: 'Date', render: (rowData) => {
-                            return (
-                                <>
-                                    {moment(rowData.date).format('MM-DD-YYYY')}
-                                </>
-                            );
-                        }
-                    },
-                    { title: 'Category', field: 'category_name' },
-                    {
-                        title: 'Amount', type: 'currency', render: (rowData) => {
-                            return (
-                                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
-                                    {toCurrency.format(Number(rowData.amount) < 0 ?
-                                        (Number(rowData.amount) * -1) : Number(rowData.amount))}
-                                </p>
-                            );
-                        }
-                    },
-                ]}
-                data={expense.monthlyExpenseReducer}
-            />
+            <div id='month-tables-wrapper'>
+                <div id='month-categories-table'>
+                    <MaterialTable
+                        title='Categories'
+                        icons={tableIcons}
+                        columns={[
+                            { title: 'Name', field: 'name' },
+                            {
+                                title: 'Necessity', render: (rowData) => {
+                                    return (
+                                        <>
+                                            {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                                        </>
+                                    );
+                                }
+                            },
+                            { title: 'Total Spent', field: 'sum', type: 'currency' }
+                        ]}
+                        data={category.monthlyCategoryReducer}
+                    />
+                </div>
+                <br />
+                <br />
+                <div id='month-transactions-table'>
+                    <MaterialTable
+                        title='Transactions'
+                        icons={tableIcons}
+                        columns={[
+                            { title: 'Name', field: 'name' },
+                            {
+                                title: 'Date', render: (rowData) => {
+                                    return (
+                                        <>
+                                            {moment(rowData.date).format('MM-DD-YYYY')}
+                                        </>
+                                    );
+                                }
+                            },
+                            { title: 'Category', field: 'category_name' },
+                            {
+                                title: 'Amount', type: 'currency', render: (rowData) => {
+                                    return (
+                                        <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                                            {toCurrency.format(Number(rowData.amount) < 0 ?
+                                                (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                                        </p>
+                                    );
+                                }
+                            },
+                        ]}
+                        data={expense.monthlyExpenseReducer}
+                    />
+
+                </div>
+            </div>
         </div>
     );
 };

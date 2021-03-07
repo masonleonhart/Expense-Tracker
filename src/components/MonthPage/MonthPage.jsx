@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Paper } from '@material-ui/core';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import MaterialTable from 'material-table';
 import tableIcons from '../../hooks/materialTableIcons';
@@ -16,7 +15,6 @@ import './MonthPage.css'
 function MonthPage() {
     const dispatch = useDispatch();
     const history = useHistory();
-    const matches = useMediaQuery('(max-width:820px)');
     const currentMonth = useSelector(store => store.expense.currentMonthReducer); // Accesses the current month that is stored inside of the expense reducer
     const expense = useSelector(store => store.expense); // Acccess the expense store
     const category = useSelector(store => store.category);  // Access the category store

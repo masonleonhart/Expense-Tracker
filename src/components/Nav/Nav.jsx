@@ -60,10 +60,10 @@ function Nav() {
       backgroundColor: '#4CBB17'
     },
     drawer: {
-      minWidth: '75%'
+      width: '30%'
     },
     drawerPaper: {
-      width: '75%'
+      width: '30%'
     },
     drawerButton: {
       height: '50px'

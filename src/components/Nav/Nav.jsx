@@ -103,16 +103,15 @@ function Nav() {
                 {user.id &&
                   <>
                     <Button>
-                      <Link className="navLink" to="/day">
-                        <TodayIcon />
-                        <p>Day Page</p>
-                      </Link>
-                    </Button>
-
-                    <Button>
                       <Link className="navLink" to="/month">
                         <CalendarTodayIcon />
-                        <p>Month Page</p>
+                        <p>Month</p>
+                      </Link>
+                    </Button>
+                    <Button>
+                      <Link className="navLink" to="/day">
+                        <TodayIcon />
+                        <p>Day</p>
                       </Link>
                     </Button>
                     {!user.access_token &&
@@ -211,16 +210,16 @@ function Nav() {
             {/* If the user is logged in, render the nav links and the logout 
             button in the drawer */}
             <Button className={classes.drawerButton} onClick={() => setToggleDrawer(false)}>
-              <Link className='drawerNavLink' to="/day">
-                <TodayIcon />
-                <p>Day Page</p>
+              <Link className='drawerNavLink' to="/month">
+                <CalendarTodayIcon />
+                <p>Month</p>
               </Link>
             </Button>
 
             <Button className={classes.drawerButton} onClick={() => setToggleDrawer(false)}>
-              <Link className='drawerNavLink' to="/month">
-                <CalendarTodayIcon />
-                <p>Month Page</p>
+              <Link className='drawerNavLink' to="/day">
+                <TodayIcon />
+                <p>Day</p>
               </Link>
             </Button>
 

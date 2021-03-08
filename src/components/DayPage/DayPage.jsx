@@ -92,7 +92,7 @@ function InfoPage() {
             columns={[
               { title: 'Name', field: 'name' },
               {
-                title: 'Category of Necessities', render: (rowData) => {
+                title: 'Necessity', render: (rowData) => {
                   return (
                     <>
                       {rowData.necessity ? <p>Yes</p> : <p>No</p>}
@@ -100,7 +100,7 @@ function InfoPage() {
                   );
                 }
               },
-              { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
+              { title: 'Total Spent', field: 'sum', type: 'currency' }
             ]}
             data={category.dailyCategoryReducer}
           />

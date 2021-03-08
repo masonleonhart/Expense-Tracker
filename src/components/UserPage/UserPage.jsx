@@ -142,7 +142,7 @@ function UserPage() {
           open={toggleModal}
           onClose={handleModalClose}
         >
-          <div style={{ backgroundColor: 'white', textAlign: 'center', height: '80%', overflowY: 'auto', borderRadius: '2%' }}>
+          <div style={{ backgroundColor: 'white', textAlign: 'center', height: 'fit-content%', maxHeight: '80%', overflowY: 'auto', borderRadius: '2%' }}>
             {toggleCatExpenses && <>
               <h2>Expenses in {expense.catViewNameReducer}</h2>
               <br />
@@ -270,7 +270,7 @@ function UserPage() {
                   </MuiPickersUtilsProvider>
                   <br />
                   <br />
-                  {!expense.newExpenseReducer.income &&
+                  {!expense.newExpenseReducer.income && <>
                     <FormControl variant='outlined' className={classes.selectOutlinedFormControl}>
                       <InputLabel id='add-expense-label'>Select a Category</InputLabel>
                       <Select
@@ -281,9 +281,10 @@ function UserPage() {
                       >
                         {category.categoryReducer.map(category => <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>)}
                       </Select>
-                    </FormControl>}
+                    </FormControl>
                   <br />
                   <br />
+                  </>}
                   <TextField
                     required
                     label='Transaction Name'
@@ -316,8 +317,8 @@ function UserPage() {
           </div>
         </Modal>
         <br />
-        <div style={{ display: 'flex', maxWidth: '91%', margin: 'auto', justifyContent: 'space-between' }}>
-          <div style={{ minWidth: '46%' }}>
+        <div id='home-category-tables-wrapper'>
+          <div id='home-categories-table'>
             <MaterialTable
               title='Categories'
               icons={tableIcons}
@@ -383,7 +384,9 @@ function UserPage() {
               data={category.categoryReducer}
             />
           </div>
-          <div style={{ minWidth: '35%' }}>
+          <br />
+          <br />
+          <div id='home-subcategories-table'>
             <MaterialTable
               title='Subcategories'
               icons={tableIcons}

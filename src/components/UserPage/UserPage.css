@@ -17,8 +17,16 @@
     width: 55%;
 }
 
+.full-width {
+    width: 100% !important;
+}
+
 #home-subcategories-table {
     width: 43%;
+}
+
+.display-none {
+    display: none !important;
 }
 
 @media (max-width: 820px) {

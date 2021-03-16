@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   HashRouter as Router,
   Route,
@@ -30,6 +30,8 @@ import "./App.css";
 
 function App() {
   const dispatch = useDispatch();
+  const [addCategoryToggle, setAddCategoryToggle] = useState(false);
+  const [addTransactionToggle, setAddTransactionToggle] = useState(false);
 
   const theme = createMuiTheme({
     palette: {
@@ -62,7 +64,10 @@ function App() {
                 exact
                 path="/user"
               >
-                <UserPage />
+                <UserPage
+                  setAddCategoryToggle={setAddCategoryToggle}
+                  setAddTransactionToggle={setAddTransactionToggle}
+                />
               </ProtectedRoute>
 
               <ProtectedRoute
@@ -70,7 +75,12 @@ function App() {
                 exact
                 path="/add"
               >
-                <AddPage />
+                <AddPage
+                  setAddCategoryToggle={setAddCategoryToggle}
+                  setAddTransactionToggle={setAddTransactionToggle}
+                  addCategoryToggle={addCategoryToggle}
+                  addTransactionToggle={addTransactionToggle}
+                />
               </ProtectedRoute>
 
               <ProtectedRoute

@@ -60,7 +60,6 @@ function Nav() {
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
-      backgroundColor: "#4CBB17",
     },
     drawer: {
       width: "30%",

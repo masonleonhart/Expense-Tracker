@@ -4,7 +4,7 @@ import axios from "axios";
 
 import "./FeedbackPage.css";
 
-import { Button, TextField, makeStyles } from "@material-ui/core";
+import { Button, TextField, makeStyles, Paper } from "@material-ui/core";
 
 import { Alert } from "@material-ui/lab";
 
@@ -59,22 +59,34 @@ function FeedbackPage() {
 
       console.log(response);
       setFeedbackInput("");
+      {
+        feedbackErrorAlertToggle && setFeedbackErrorAlertToggle(false);
+      }
+      setFeedbackSuccessAlertToggle(true);
     } catch (error) {
       console.log("Error in submitting feedback", error);
+      setFeedbackErrorAlertToggle(true);
     }
   };
 
   const useStyles = makeStyles({
     keySubmitButton: {
       color: "white",
-      marginLeft: ".5rem",
-      marginTop: "1rem",
     },
     feedbackSubmitButton: {
       color: "white",
     },
     feedbackTextField: {
       width: "15rem",
+    },
+    paper: {
+      padding: "2rem",
+      width: "91%",
+      margin: "auto",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      textAlign: "center",
     },
   });
 
@@ -85,99 +97,108 @@ function FeedbackPage() {
   }, []);
 
   return (
-    <div
-      className="container"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      {!user.plaid_key && (
-        <div id="plaid-key-form">
-          <h2 style={{ marginTop: 0 }}>Do you have a Plaid Key?</h2>
-          {keyErrorAlertToggle && (
-            <>
-              <Alert
-                onClose={() => setKeyErrorAlertToggle(false)}
-                severity="error"
-              >
-                {keyErrorBadRequest
-                  ? "Invalid key, please try again."
-                  : "There was an error in checking your key."}
-              </Alert>
-              <br />
-            </>
-          )}
-          {keySuccessAlertToggle && (
-            <>
-              <Alert onClose={() => setKeySuccessAlertToggle(false)}>
-                Plaid Key added successfully!
-              </Alert>
-              <br />
-            </>
-          )}
-          <form onSubmit={handleKeySubmit}>
-            <TextField
-              required
-              label="Enter Key"
-              variant="outlined"
-              value={keyInput}
-              onChange={(e) => setKeyInput(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.keySubmitButton}
-            >
-              Submit
-            </Button>
-          </form>
-          <br />
-          <br />
-        </div>
-      )}
-      <h2 style={{ marginTop: 0 }}>Drop some feedback! (Anonymous)</h2>
-      {feedbackErrorAlertToggle && (
-        <>
-          <Alert
-            onClose={() => setFeedbackErrorAlertToggle(false)}
-            severity="error"
-          >
-            Error in adding feedback.
-          </Alert>
-          <br />
-        </>
-      )}
-      {feedbackSuccessAlertToggle && (
-        <>
-          <Alert onClose={() => setFeedbackSuccessAlertToggle(false)}>
-            Feedback added successfully!
-          </Alert>
-          <br />
-        </>
-      )}
-      <form onSubmit={handleFeedbackSubmit}>
-        <TextField
-          className={classes.feedbackTextField}
-          multiline
-          label="Feedback?"
-          value={feedbackInput}
-          onChange={(e) => setFeedbackInput(e.target.value)}
-        />
-        <br />
-        <br />
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          className={classes.feedbackSubmitButton}
+    <div className="container">
+      <Paper className={classes.paper}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            width: "100%",
+          }}
         >
-          Submit
-        </Button>
-      </form>
+          <div
+            id="plaid-key-form"
+            style={{ display: user.plaid_key && "none" }}
+          >
+            <h2 style={{ marginTop: 0 }}>Do you have a Plaid Key?</h2>
+            {keyErrorAlertToggle && (
+              <>
+                <Alert
+                  onClose={() => setKeyErrorAlertToggle(false)}
+                  severity="error"
+                >
+                  {keyErrorBadRequest
+                    ? "Invalid key, please try again."
+                    : "There was an error in checking your key."}
+                </Alert>
+                <br />
+              </>
+            )}
+            {keySuccessAlertToggle && (
+              <>
+                <Alert onClose={() => setKeySuccessAlertToggle(false)}>
+                  Plaid Key added successfully!
+                </Alert>
+                <br />
+              </>
+            )}
+            <form onSubmit={handleKeySubmit}>
+              <TextField
+                required
+                label="Enter Key"
+                variant="outlined"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+              />
+              <br />
+              <br />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.keySubmitButton}
+              >
+                Submit
+              </Button>
+            </form>
+          </div>
+          <div>
+            <h2 style={{ marginTop: 0 }}>Drop some feedback! (Anonymous)</h2>
+            {feedbackErrorAlertToggle && (
+              <>
+                <Alert
+                  onClose={() => setFeedbackErrorAlertToggle(false)}
+                  severity="error"
+                >
+                  Error in adding feedback.
+                </Alert>
+                <br />
+              </>
+            )}
+            {feedbackSuccessAlertToggle && (
+              <>
+                <Alert onClose={() => setFeedbackSuccessAlertToggle(false)}>
+                  Feedback added successfully!
+                </Alert>
+                <br />
+              </>
+            )}
+            <form onSubmit={handleFeedbackSubmit}>
+              <TextField
+                className={classes.feedbackTextField}
+                multiline
+                label="Feedback?"
+                variant='outlined'
+                value={feedbackInput}
+                onChange={(e) => setFeedbackInput(e.target.value)}
+              />
+              <br />
+              <br />
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                className={classes.feedbackSubmitButton}
+              >
+                Submit
+              </Button>
+            </form>
+          </div>
+        </div>
+      </Paper>
+      <br />
+      <br />
+      <Paper></Paper>
     </div>
   );
 }

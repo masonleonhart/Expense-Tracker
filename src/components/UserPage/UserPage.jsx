@@ -29,7 +29,7 @@ import Add from "@material-ui/icons/Add";
 
 import "./UserPage.css";
 
-function UserPage() {
+function UserPage({ setAddCategoryToggle, setAddTransactionToggle }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const expense = useSelector((store) => store.expense);
@@ -305,6 +305,7 @@ function UserPage() {
                   },
                   onClick: (event, rowData) => {
                     history.push("add");
+                    setAddCategoryToggle(true);
                   },
                 },
               ]}
@@ -314,7 +315,6 @@ function UserPage() {
               data={category.categoryReducer}
             />
           </div>
-          <br />
           <br />
           <div
             id="home-subcategories-table"
@@ -426,6 +426,7 @@ function UserPage() {
               },
               onClick: (event, rowData) => {
                 history.push("/add");
+                setAddTransactionToggle(true);
               },
             },
           ]}

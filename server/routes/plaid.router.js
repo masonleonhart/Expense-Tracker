@@ -26,7 +26,7 @@ router.post('/link_token', rejectUnauthenticated, async (req, res) => {
                 user: {
                     client_user_id: `${req.user.id}`
                 },
-                client_name: 'Expense Tracker',
+                client_name: 'Melt',
                 country_codes: ['US'],
                 language: 'en',
                 access_token: req.body.access_token
@@ -39,7 +39,7 @@ router.post('/link_token', rejectUnauthenticated, async (req, res) => {
                 user: {
                     client_user_id: `${req.user.id}`
                 },
-                client_name: 'Expense Tracker',
+                client_name: 'Melt',
                 products: ['transactions'],
                 country_codes: ['US'],
                 language: 'en'

@@ -89,7 +89,7 @@ function Nav() {
                   !toggleDrawer ? setToggleDrawer(true) : setToggleDrawer(false)
                 }
               >
-                <MenuIcon className={classes.menuIcon} />
+                <MenuIcon className={classes.menuIcon} id={plaid.plaidError ? 'menuError' : ''} />
               </Button>
             )}
             <Link to="/home">

@@ -5,10 +5,18 @@
 
 CREATE TABLE "user" (
     "id" SERIAL PRIMARY KEY,
+    "email" VARCHAR (80) UNIQUE NOT NULL,
     "username" VARCHAR (80) UNIQUE NOT NULL,
     "password" VARCHAR (1000) NOT NULL,
     "access_token" VARCHAR (100) UNIQUE DEFAULT NULL,
-    "new_user" BOOLEAN DEFAULT TRUE
+    "admin_user" BOOLEAN DEFAULT FALSE,
+    "plaid_key" VARCHAR (50) UNIQUE DEFAULT NULL
+);
+
+CREATE TABLE "plaid-keys" (
+	"id" SERIAL PRIMARY KEY,
+	"key" VARCHAR (50) UNIQUE NOT NULL,
+	"user_id" INTEGER REFERENCES "user" DEFAULT NULL
 );
 
 CREATE TABLE "category" (
@@ -35,4 +43,9 @@ CREATE TABLE "transaction-history" (
 	"date" DATE NOT NULL,
 	"transaction_id" VARCHAR(100) UNIQUE DEFAULT NULL,
 	"income" BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE "feedback" (
+	"id" serial PRIMARY KEY,
+	"feedback" VARCHAR (1000)
 );

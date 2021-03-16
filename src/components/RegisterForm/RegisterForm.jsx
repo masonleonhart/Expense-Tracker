@@ -7,6 +7,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 
 function RegisterForm() {
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const errors = useSelector((store) => store.errors);
@@ -18,6 +19,7 @@ function RegisterForm() {
     dispatch({
       type: 'REGISTER',
       payload: {
+        email: email,
         username: username,
         password: password,
       },
@@ -51,6 +53,16 @@ function RegisterForm() {
         )}
         <TextField
           required
+          type='email'
+          label='Email Address'
+          variant='outlined'
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <br />
+        <br />
+        <TextField
+          required
           label='Username'
           variant='outlined'
           value={username}
@@ -68,7 +80,7 @@ function RegisterForm() {
         />
         <br />
         <br />
-        <Button type='submit' className={classes.button} variant='contained' color='primary'>Log In</Button>
+        <Button type='submit' className={classes.button} variant='contained' color='primary'>Register</Button>
       </form>
     </ThemeProvider>
   );

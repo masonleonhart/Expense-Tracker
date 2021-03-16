@@ -114,8 +114,14 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
         console.log('Retrieved plaid transactions successfully');
         res.sendStatus(200);
     } catch (error) {
+        let errorStatus = 500;
+
+        if (error.error_code === 'ITEM_LOGIN_REQUIRED') {
+            errorStatus = 400
+        };
+
         console.log('Error in getting plaid transactions', error);
-        res.sendStatus(500);
+        res.sendStatus(errorStatus);
     };
 });
 

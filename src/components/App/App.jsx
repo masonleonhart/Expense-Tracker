@@ -15,10 +15,11 @@ import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 
 import UserPage from '../UserPage/UserPage';
 import AddPage from '../AddPage/AddPage';
-import InfoPage from '../DayPage/DayPage';
+import DayPage from '../DayPage/DayPage';
 import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
 import MonthPage from '../MonthPage/MonthPage';
+import FeedbackPage from '../FeedbackPage/FeedbackPage';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -65,7 +66,7 @@ function App() {
               exact
               path="/day"
             >
-              <InfoPage />
+              <DayPage />
             </ProtectedRoute>
 
             <ProtectedRoute
@@ -74,6 +75,14 @@ function App() {
               path="/month"
             >
               <MonthPage />
+            </ProtectedRoute>
+
+            <ProtectedRoute
+              // logged in shows MonthPage else shows LoginPage
+              exact
+              path="/feedback"
+            >
+              <FeedbackPage />
             </ProtectedRoute>
 
             {/* When a value is supplied for the authRedirect prop the user will
@@ -96,7 +105,7 @@ function App() {
               // - else shows RegisterPage at "/registration"
               exact
               path="/registration"
-              authRedirect="/user"
+              authRedirect="/feedback"
             >
               <RegisterPage />
             </ProtectedRoute>

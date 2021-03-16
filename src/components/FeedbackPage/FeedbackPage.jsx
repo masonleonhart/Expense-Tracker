@@ -8,6 +8,13 @@ import { Button, TextField, makeStyles, Paper } from "@material-ui/core";
 
 import { Alert } from "@material-ui/lab";
 
+import CategorizePic from "../../Assets/CategorizePic.png";
+import DetailsPic from "../../Assets/DetailsPic.png";
+import AddTransPic from "../../Assets/AddTransPic.png";
+import CalendarDay from "../../Assets/CalendarDay.png";
+import NavbarPic from "../../Assets/NavbarPic.png";
+import DayNavPic from "../../Assets/DayNavPic.png";
+
 function FeedbackPage() {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
@@ -178,7 +185,7 @@ function FeedbackPage() {
                 className={classes.feedbackTextField}
                 multiline
                 label="Feedback?"
-                variant='outlined'
+                variant="outlined"
                 value={feedbackInput}
                 onChange={(e) => setFeedbackInput(e.target.value)}
               />
@@ -195,10 +202,67 @@ function FeedbackPage() {
             </form>
           </div>
         </div>
+        <br />
+        <h1>How to use Melt</h1>
+        <br />
+        <div className="tutorial-section">
+          <img src={NavbarPic} style={{ width: "27rem" }} />
+          <p>
+            Melt is divided into three sections, "Overview" or "Home",
+            "Monthly", and a "Daily" section. Each section allows you to see how
+            you spend your money differently in different categories and over
+            different periods of time.
+          </p>
+        </div>
+        <br />
+        <div className="tutorial-section reverse">
+          <p>
+            Click on the plus in either the "Uncategorized Transactions" or the
+            "Categories" tables on the Home Page to add transactions or income
+            and categories to Melt.
+          </p>
+          <img src={AddTransPic} style={{ width: "10rem" }} />
+        </div>
+        <br />
+        <div className="tutorial-section">
+          <img src={CategorizePic} style={{ width: "15rem" }} />
+          <p>
+            Use the "Select a Category" dropdown on the Uncategorized Expenses
+            table to assign your expenses to categoreies (income by defualt is
+            uncategorized and doesn't appear in the Uncategorized Expenses
+            table).
+          </p>
+        </div>
+        <br />
+        <div className="tutorial-section reverse">
+          <p>
+            Click on the three stacked dots in the Categories table on the Home
+            Page to see how many expenses you've added to that category.
+          </p>
+          <img src={DetailsPic} style={{ width: "10rem" }} />
+        </div>
+        <div className="tutorial-section">
+          <img src={CalendarDay} style={{ width: "15rem" }} />
+          <p>
+            The calendar on the Month section shows your daily net-income for
+            each day on the calendar, a table of categories that you have
+            transactions in for that month, and a list of all of your
+            transactions for that month (expenses and incomes). The Daily
+            section has the same tables, but over that day.
+          </p>
+        </div>
+        <br />
+        <div className="tutorial-section reverse">
+          <p>
+            Navigate to Mint's Day section by clicking the navigation button in
+            the header, or by clicking on a specific day on the calendar in the
+            Month section. Navigate throughout the different days by clicking
+            the dates in the Day section, and head back to the Month section by
+            clicking the month on the top of the Day navigation.
+          </p>
+          <img src={DayNavPic} style={{ width: "26rem" }} />
+        </div>
       </Paper>
-      <br />
-      <br />
-      <Paper></Paper>
     </div>
   );
 }

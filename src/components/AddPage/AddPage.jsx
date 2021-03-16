@@ -22,9 +22,6 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 
-import { createMuiTheme } from "@material-ui/core/styles";
-import { ThemeProvider } from "@material-ui/styles";
-
 function AddPage() {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -52,14 +49,6 @@ function AddPage() {
     history.push("/user");
   };
 
-  const theme = createMuiTheme({
-    palette: {
-      primary: {
-        main: "#4CBB17",
-      },
-    },
-  });
-
   const useStyles = makeStyles({
     button: {
       color: "white",
@@ -73,211 +62,207 @@ function AddPage() {
   const classes = useStyles();
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className="container">
-        <br />
-        <div style={{ margin: "auto", width: "fit-content" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              dispatch({ type: "RESET_NEW_CATEGORY_REDUCER" });
-              dispatch({ type: "RESET_NEW_EXPENSE_REDUCER" });
-              history.push("/user");
-            }}
-          >
-            Cancel
-          </Button>
+    <div className="container">
+      <div id="forms-wrapper">
+        <div>
+          <h2 style={{ marginTop: 0 }}>Add a Category</h2>
           <br />
+          <form onSubmit={handleCategorySubmit}>
+            <TextField
+              required
+              label="Category Name"
+              variant="outlined"
+              value={category.newCategoryReducer.name}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_NEW_CATEGORY_NAME",
+                  payload: e.target.value,
+                })
+              }
+            />
+            <br />
+            <br />
+            <br />
+            <FormControl>
+              <FormLabel>Necessity?</FormLabel>
+              <RadioGroup row value={category.newCategoryReducer.necessity}>
+                <FormControlLabel
+                  value={false}
+                  onChange={(e) => {
+                    dispatch({
+                      type: "SET_NEW_CATEGORY_NECESSITY_FALSE",
+                    });
+                  }}
+                  label="No"
+                  labelPlacement="top"
+                  control={<Radio color="primary" />}
+                ></FormControlLabel>
+                <FormControlLabel
+                  value={true}
+                  onChange={(e) => {
+                    dispatch({ type: "SET_NEW_CATEGORY_NECESSITY_TRUE" });
+                  }}
+                  label="Yes"
+                  labelPlacement="top"
+                  control={<Radio color="primary" />}
+                ></FormControlLabel>
+              </RadioGroup>
+            </FormControl>
+            <br />
+            <br />
+            <br />
+            <br />
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              type="submit"
+            >
+              Add Category
+            </Button>
+          </form>
           <br />
         </div>
-        <div id="forms-wrapper">
-          <div>
-            <h2>Add a Category</h2>
+        <div>
+          <h2 style={{ marginTop: 0 }}>Add a Transaction</h2>
+          <br />
+          <form onSubmit={handleExpenseSubmit}>
+            <FormControl>
+              <FormLabel>Type of Transaction</FormLabel>
+              <RadioGroup row value={expense.newExpenseReducer.income}>
+                <FormControlLabel
+                  value={false}
+                  onChange={(e) => {
+                    dispatch({ type: "SET_NEW_EXPENSE_INCOME_FALSE" });
+                  }}
+                  label="Expense"
+                  labelPlacement="top"
+                  control={<Radio color="primary" />}
+                ></FormControlLabel>
+                <FormControlLabel
+                  value={true}
+                  onChange={(e) => {
+                    dispatch({
+                      type: "SET_NEW_EXPENSE_CATEGORY",
+                      payload: "",
+                    });
+                    dispatch({ type: "SET_NEW_EXPENSE_INCOME_TRUE" });
+                  }}
+                  label="Income"
+                  labelPlacement="top"
+                  control={<Radio color="primary" />}
+                ></FormControlLabel>
+              </RadioGroup>
+            </FormControl>
             <br />
-            <form onSubmit={handleCategorySubmit}>
-              <TextField
+            <br />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
                 required
-                label="Category Name"
-                variant="outlined"
-                value={category.newCategoryReducer.name}
-                onChange={(e) =>
+                disableToolbar
+                disableFuture
+                variant="inline"
+                format="yyyy-MM-dd"
+                label="Transaction Date"
+                value={moment(expense.newExpenseReducer.date)}
+                onChange={(date) =>
                   dispatch({
-                    type: "SET_NEW_CATEGORY_NAME",
-                    payload: e.target.value,
+                    type: "SET_NEW_EXPENSE_DATE",
+                    payload: moment(date).format("YYYY-MM-DD"),
                   })
                 }
               />
-              <br />
-              <br />
-              <br />
-              <FormControl>
-                <FormLabel>Necessity?</FormLabel>
-                <RadioGroup row value={category.newCategoryReducer.necessity}>
-                  <FormControlLabel
-                    value={false}
-                    onChange={(e) => {
+            </MuiPickersUtilsProvider>
+            <br />
+            <br />
+            {!expense.newExpenseReducer.income && (
+              <>
+                <FormControl
+                  variant="outlined"
+                  className={classes.selectOutlinedFormControl}
+                >
+                  <InputLabel id="add-expense-label">
+                    Select a Category
+                  </InputLabel>
+                  <Select
+                    labelId="add-expense-label"
+                    label="Select a Category"
+                    value={expense.newExpenseReducer.category_id}
+                    onChange={(e) =>
                       dispatch({
-                        type: "SET_NEW_CATEGORY_NECESSITY_FALSE",
-                      });
-                    }}
-                    label="No"
-                    labelPlacement="top"
-                    control={<Radio color="primary" />}
-                  ></FormControlLabel>
-                  <FormControlLabel
-                    value={true}
-                    onChange={(e) => {
-                      dispatch({ type: "SET_NEW_CATEGORY_NECESSITY_TRUE" });
-                    }}
-                    label="Yes"
-                    labelPlacement="top"
-                    control={<Radio color="primary" />}
-                  ></FormControlLabel>
-                </RadioGroup>
-              </FormControl>
-              <br />
-              <br />
-              <br />
-              <br />
+                        type: "SET_NEW_EXPENSE_CATEGORY",
+                        payload: e.target.value,
+                      })
+                    }
+                  >
+                    {category.categoryReducer.map((category) => (
+                      <MenuItem value={category.id} key={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <br />
+                <br />
+              </>
+            )}
+            <TextField
+              required
+              label="Transaction Name"
+              variant="outlined"
+              value={expense.newExpenseReducer.name}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_NEW_EXPENSE_NAME",
+                  payload: e.target.value,
+                })
+              }
+            />
+            <br />
+            <br />
+            <TextField
+              required
+              type="number"
+              label="Transaction Amount"
+              variant="outlined"
+              value={expense.newExpenseReducer.amount}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_NEW_EXPENSE_AMOUNT",
+                  payload: e.target.value,
+                })
+              }
+            />
+            <br />
+            <br />
+            <div id="add-submit-button">
               <Button
                 variant="contained"
                 color="primary"
                 className={classes.button}
                 type="submit"
               >
-                Add Category
+                Add Transaction
               </Button>
-            </form>
-            <br />
-          </div>
-          <div>
-            <h2>Add a Transaction</h2>
-            <br />
-            <form onSubmit={handleExpenseSubmit}>
-              <FormControl>
-                <FormLabel>Type of Transaction</FormLabel>
-                <RadioGroup row value={expense.newExpenseReducer.income}>
-                  <FormControlLabel
-                    value={false}
-                    onChange={(e) => {
-                      dispatch({ type: "SET_NEW_EXPENSE_INCOME_FALSE" });
-                    }}
-                    label="Expense"
-                    labelPlacement="top"
-                    control={<Radio color="primary" />}
-                  ></FormControlLabel>
-                  <FormControlLabel
-                    value={true}
-                    onChange={(e) => {
-                      dispatch({
-                        type: "SET_NEW_EXPENSE_CATEGORY",
-                        payload: "",
-                      });
-                      dispatch({ type: "SET_NEW_EXPENSE_INCOME_TRUE" });
-                    }}
-                    label="Income"
-                    labelPlacement="top"
-                    control={<Radio color="primary" />}
-                  ></FormControlLabel>
-                </RadioGroup>
-              </FormControl>
-              <br />
-              <br />
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  required
-                  disableToolbar
-                  disableFuture
-                  variant="inline"
-                  format="yyyy-MM-dd"
-                  label="Transaction Date"
-                  value={moment(expense.newExpenseReducer.date)}
-                  onChange={(date) =>
-                    dispatch({
-                      type: "SET_NEW_EXPENSE_DATE",
-                      payload: moment(date).format("YYYY-MM-DD"),
-                    })
-                  }
-                />
-              </MuiPickersUtilsProvider>
-              <br />
-              <br />
-              {!expense.newExpenseReducer.income && (
-                <>
-                  <FormControl
-                    variant="outlined"
-                    className={classes.selectOutlinedFormControl}
-                  >
-                    <InputLabel id="add-expense-label">
-                      Select a Category
-                    </InputLabel>
-                    <Select
-                      labelId="add-expense-label"
-                      label="Select a Category"
-                      value={expense.newExpenseReducer.category_id}
-                      onChange={(e) =>
-                        dispatch({
-                          type: "SET_NEW_EXPENSE_CATEGORY",
-                          payload: e.target.value,
-                        })
-                      }
-                    >
-                      {category.categoryReducer.map((category) => (
-                        <MenuItem value={category.id} key={category.id}>
-                          {category.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <br />
-                  <br />
-                </>
-              )}
-              <TextField
-                required
-                label="Transaction Name"
-                variant="outlined"
-                value={expense.newExpenseReducer.name}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_NEW_EXPENSE_NAME",
-                    payload: e.target.value,
-                  })
-                }
-              />
-              <br />
-              <br />
-              <TextField
-                required
-                type="number"
-                label="Transaction Amount"
-                variant="outlined"
-                value={expense.newExpenseReducer.amount}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_NEW_EXPENSE_AMOUNT",
-                    payload: e.target.value,
-                  })
-                }
-              />
-              <br />
-              <br />
-              <div id="add-submit-button">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  className={classes.button}
-                  type="submit"
-                >
-                  Add Transaction
-                </Button>
-              </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
-    </ThemeProvider>
+      <br />
+      <div style={{ margin: "auto", width: "fit-content" }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => {
+            dispatch({ type: "RESET_NEW_CATEGORY_REDUCER" });
+            dispatch({ type: "RESET_NEW_EXPENSE_REDUCER" });
+            history.push("/user");
+          }}
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
   );
 }
 

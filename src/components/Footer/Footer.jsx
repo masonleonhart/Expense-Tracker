@@ -1,5 +1,5 @@
-import React from 'react';
-import './Footer.css';
+import React from "react";
+import "./Footer.css";
 
 // This is one of our simplest components
 // It doesn't have local state, so it can be a function component.
@@ -7,22 +7,28 @@ import './Footer.css';
 // or even care what the redux state is, so it doesn't need 'connect()'
 
 function Footer() {
-  return <footer>
-    <p>&copy; Mason Leonhart</p>
-    <p><a href="https://github.com/masonleonhart"
-          className="btn_asLink"
-          target='_blank'
-          title='My Github Page'
-        >
-          github.com/masonleonhart
-        </a> | <a href="https://www.linkedin.com/in/masonleonhart/"
-          className="btn_asLink"
-          target='_blank'
-          title='My Linkedin Page'
-        >
-          linkedin.com/in/masonleonhart
-        </a> | mason.leonhart@gmail.com</p>
-  </footer>;
+  return (
+    <footer>
+      <p>Mason Leonhart &copy; 2021</p>
+      <a
+        href="https://masonleonhart.github.io/portfolio-site/"
+        className="btn_asLink"
+        target="_blank"
+        title="My Github Page"
+      >
+        Portfolio
+      </a>{" "}
+      |{" "}
+      <a
+        href="mailto:mason.leonhart@gmail.com"
+        className="btn_asLink"
+        target="_blank"
+        title="My Linkedin Page"
+      >
+        Email me
+      </a>
+    </footer>
+  );
 }
 
 export default Footer;

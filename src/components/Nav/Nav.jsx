@@ -53,8 +53,7 @@ function Nav() {
       height: "36px",
     },
     menuButton: {
-      minHeight: "64px",
-      borderRadius: "50%",
+      color: "white",
     },
     navLink: {
       color: "#f2f2f2",
@@ -80,21 +79,30 @@ function Nav() {
     <>
       <AppBar className={classes.appBar}>
         <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: matches && '100%'
+            }}
+          >
+            <Link to="/home">
+              <h2 className="nav-title">Melt</h2>
+            </Link>
             {matches && (
               // Only show menu icon if screen width is shorter than the "matches" width
               <Button
                 className={classes.menuButton}
+                id={plaid.plaidError ? "menuError" : ""}
                 onClick={() =>
                   !toggleDrawer ? setToggleDrawer(true) : setToggleDrawer(false)
                 }
               >
-                <MenuIcon className={classes.menuIcon} id={plaid.plaidError ? 'menuError' : ''} />
+                Menu
+                <MenuIcon className={classes.menuIcon} />
               </Button>
             )}
-            <Link to="/home">
-              <h2 className="nav-title">Expense Tracker</h2>
-            </Link>
             {!matches && (
               // If the screen width is more than the "matches" width, render the nav buttons
               // On the nav bar
@@ -224,6 +232,7 @@ function Nav() {
       <br />
       <Drawer
         open={toggleDrawer}
+        anchor='right'
         onClose={() => setToggleDrawer(false)}
         variant="persistent"
         className={classes.drawer}
@@ -233,7 +242,6 @@ function Nav() {
       >
         <Toolbar />
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <br />
           <Button
             component={Link}
             to={loginLinkData.path}

@@ -60,7 +60,6 @@ function MonthPage() {
 
     return (
         <div className='container'>
-            <br />
             <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
                 <br />
                 <Calendar

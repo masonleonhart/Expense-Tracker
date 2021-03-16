@@ -48,6 +48,25 @@ router.post('/logout', (req, res) => {
   res.sendStatus(200);
 });
 
+router.post('/feedback', rejectUnauthenticated, (req, res) => {
+  const sqlQuery = `INSERT INTO "feedback" ("feedback")
+                    VALUES ($1);`
+
+  if (!req.body.feedbackInput) {
+    console.log('Invalid input');
+    res.sendStatus(400);
+    return;
+  };
+
+  pool.query(sqlQuery, [req.body.feedbackInput]).then(() => {
+    console.log('Added feedback successfully');
+    res.sendStatus(201);
+  }).catch(err => {
+    console.log('Error in adding feedback', err);
+    res.sendStatus(500);
+  });
+});
+
 router.put('/keycheck', rejectUnauthenticated, async (req, res) => {
   const sqlQueryOne = `SELECT * FROM "plaid-keys";`;
   const sqlQueryTwo = `UPDATE "plaid-keys" SET "user_id" = '${req.user.id}'

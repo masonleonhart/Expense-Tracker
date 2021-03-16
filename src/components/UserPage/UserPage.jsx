@@ -20,9 +20,6 @@ import {
   Paper,
 } from "@material-ui/core";
 
-import { createMuiTheme } from "@material-ui/core/styles";
-import { ThemeProvider } from "@material-ui/styles";
-
 import MaterialTable from "material-table";
 import tableIcons from "../../hooks/materialTableIcons";
 
@@ -74,14 +71,6 @@ function UserPage() {
     setToggleSubcatExpenses(false);
   };
 
-  const theme = createMuiTheme({
-    palette: {
-      primary: {
-        main: "#4CBB17",
-      },
-    },
-  });
-
   const useStyles = makeStyles({
     uncategorizedFormControl: {
       minWidth: 150,
@@ -115,7 +104,6 @@ function UserPage() {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
       <div className="container">
         <Modal
           style={{
@@ -264,7 +252,6 @@ function UserPage() {
             <br />
           </div>
         </Modal>
-        <br />
         <div id="home-category-tables-wrapper">
           <div
             id="home-categories-table"
@@ -445,7 +432,6 @@ function UserPage() {
           data={expense.uncategorizedExpenseReducer}
         />
       </div>
-    </ThemeProvider>
   );
 }
 

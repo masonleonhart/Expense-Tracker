@@ -8,53 +8,73 @@ import { Button, TextField, makeStyles } from "@material-ui/core";
 
 import { Alert } from "@material-ui/lab";
 
-import { createMuiTheme } from "@material-ui/core/styles";
-import { ThemeProvider } from "@material-ui/styles";
-
 function FeedbackPage() {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
-  const [errorAlertToggle, setErrorAlertToggle] = useState(false);
-  const [successAlertToggle, setSuccessAlertToggle] = useState(false);
+  const [keyErrorAlertToggle, setKeyErrorAlertToggle] = useState(false);
+  const [keySuccessAlertToggle, setKeySuccessAlertToggle] = useState(false);
+  const [keyErrorBadRequest, setKeyErrorBadRequest] = useState(true);
+  const [feedbackErrorAlertToggle, setFeedbackErrorAlertToggle] = useState(
+    false
+  );
+  const [feedbackSuccessAlertToggle, setFeedbackSuccessAlertToggle] = useState(
+    false
+  );
   const [keyInput, setKeyInput] = useState("");
-  const [errorBadRequest, setErrorBadRequest] = useState(true);
+  const [feedbackInput, setFeedbackInput] = useState("");
 
   const handleKeySubmit = async (e) => {
     try {
       e.preventDefault();
+
       const response = await axios.put(`/api/user/keycheck`, {
         keyInput,
       });
-      console.log(response);
+
       setKeyInput("");
-      {errorAlertToggle && setErrorAlertToggle(false);}
-      setSuccessAlertToggle(true);
+      {
+        keyErrorAlertToggle && setKeyErrorAlertToggle(false);
+      }
+      setKeySuccessAlertToggle(true);
       setTimeout(() => dispatch({ type: "FETCH_USER" }), 3000);
     } catch (err) {
       if (err.response.status !== 400) {
-        setErrorBadRequest(false);
-      } else if (errorBadRequest !== true && err.response.status === 400) {
-        setErrorBadRequest(true);
+        setKeyErrorBadRequest(false);
+      } else if (keyErrorBadRequest !== true && err.response.status === 400) {
+        setKeyErrorBadRequest(true);
       }
 
       console.log("Error in submitting key", err);
-      setErrorAlertToggle(true);
+      setKeyErrorAlertToggle(true);
     }
   };
 
-  const theme = createMuiTheme({
-    palette: {
-      primary: {
-        main: "#4CBB17",
-      },
-    },
-  });
+  const handleFeedbackSubmit = async (e) => {
+    try {
+      e.preventDefault();
+
+      const response = await axios.post("/api/user/feedback", {
+        feedbackInput,
+      });
+
+      console.log(response);
+      setFeedbackInput("");
+    } catch (error) {
+      console.log("Error in submitting feedback", error);
+    }
+  };
 
   const useStyles = makeStyles({
     keySubmitButton: {
       color: "white",
       marginLeft: ".5rem",
       marginTop: "1rem",
+    },
+    feedbackSubmitButton: {
+      color: "white",
+    },
+    feedbackTextField: {
+      width: "15rem",
     },
   });
 
@@ -64,65 +84,101 @@ function FeedbackPage() {
     dispatch({ type: "FETCH_LINK_TOKEN", payload: user.access_token });
   }, []);
 
-  console.log(successAlertToggle);
-
   return (
-    <ThemeProvider theme={theme}>
-      <div
-        className="containter"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        <br />
-        {!user.plaid_key && (
-          <div id="plaid-key-form">
-            <h2>Do you have a Plaid Key?</h2>
-            {errorAlertToggle && (
-              <>
-                <Alert
-                  onClose={() => setErrorAlertToggle(false)}
-                  severity="error"
-                >
-                  {errorBadRequest
-                    ? "Invalid key, please try again."
-                    : "There was an error in checking your key."}
-                </Alert>
-                <br />
-              </>
-            )}
-            {successAlertToggle && (
-              <>
-                <Alert onClose={() => setSuccessAlertToggle(false)}>
-                  Plaid Key added successfully!
-                </Alert>
-                <br />
-              </>
-            )}
-            <form onSubmit={handleKeySubmit}>
-              <TextField
-                required
-                label="Enter Key"
-                variant="outlined"
-                value={keyInput}
-                onChange={(e) => setKeyInput(e.target.value)}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.keySubmitButton}
+    <div
+      className="container"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
+      {!user.plaid_key && (
+        <div id="plaid-key-form">
+          <h2 style={{ marginTop: 0 }}>Do you have a Plaid Key?</h2>
+          {keyErrorAlertToggle && (
+            <>
+              <Alert
+                onClose={() => setKeyErrorAlertToggle(false)}
+                severity="error"
               >
-                Submit
-              </Button>
-            </form>
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+                {keyErrorBadRequest
+                  ? "Invalid key, please try again."
+                  : "There was an error in checking your key."}
+              </Alert>
+              <br />
+            </>
+          )}
+          {keySuccessAlertToggle && (
+            <>
+              <Alert onClose={() => setKeySuccessAlertToggle(false)}>
+                Plaid Key added successfully!
+              </Alert>
+              <br />
+            </>
+          )}
+          <form onSubmit={handleKeySubmit}>
+            <TextField
+              required
+              label="Enter Key"
+              variant="outlined"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              className={classes.keySubmitButton}
+            >
+              Submit
+            </Button>
+          </form>
+          <br />
+          <br />
+        </div>
+      )}
+      <h2 style={{ marginTop: 0 }}>Drop some feedback! (Anonymous)</h2>
+      {feedbackErrorAlertToggle && (
+        <>
+          <Alert
+            onClose={() => setFeedbackErrorAlertToggle(false)}
+            severity="error"
+          >
+            Error in adding feedback.
+          </Alert>
+          <br />
+        </>
+      )}
+      {feedbackSuccessAlertToggle && (
+        <>
+          <Alert onClose={() => setFeedbackSuccessAlertToggle(false)}>
+            Feedback added successfully!
+          </Alert>
+          <br />
+        </>
+      )}
+      <form onSubmit={handleFeedbackSubmit}>
+        <TextField
+          className={classes.feedbackTextField}
+          multiline
+          label="Feedback?"
+          value={feedbackInput}
+          onChange={(e) => setFeedbackInput(e.target.value)}
+        />
+        <br />
+        <br />
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          className={classes.feedbackSubmitButton}
+        >
+          Submit
+        </Button>
+      </form>
+    </div>
   );
 }
 

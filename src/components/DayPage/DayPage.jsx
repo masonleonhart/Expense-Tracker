@@ -55,7 +55,6 @@ function InfoPage() {
 
   return (
     <div className="container" style={{ textAlign: 'center' }}>
-      <br />
       <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
         <div style={{ margin: '0 15px 0 15px' }}>
           <Button onClick={() => {

@@ -20,7 +20,7 @@ router.post('/', rejectUnauthenticated, (req, res) => {
 
     let category_id = req.body.category_id === '' ? null : req.body.category_id;
 
-    pool.query(sqlQuery, [category_id, `${req.body.name}`, Number(`${req.body.income && '-'}${req.body.amount}`), `${req.body.date}`, req.body.income]).then(() => {
+    pool.query(sqlQuery, [category_id, `${req.body.name}`, Number(`${req.body.income ? '-' : ''}${req.body.amount}`), `${req.body.date}`, req.body.income]).then(() => {
         console.log('Added new expense successfully');
         res.sendStatus(201);
     }).catch(err => {

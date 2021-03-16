@@ -33,17 +33,33 @@
     justify-content: center;
 }
 
-@media (max-width: 320px) {
-    .container {
-        padding: 5px !important;
+#month-tables-wrapper {
+    display: flex;
+    width: 91%;
+    margin: auto;
+    justify-content: space-between;
+}
+
+#month-categories-table {
+    width: 45%;
+}
+
+#month-transactions-table {
+    width: 53%;
+}
+
+@media (max-width: 820px) {
+    #month-tables-wrapper {
+        justify-content: space-around;
+        flex-wrap: wrap;
+        flex-direction: column;
     }
 
-    .react-calendar {
-        width: 100%;
+    #month-categories-table {
+        width: 100%
     }
 
-    .calendar-tile {
-        font-size: 9px !important;
-        min-height: 30px;
+    #month-transactions-table {
+        width: 100%
     }
 }

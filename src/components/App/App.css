@@ -36,7 +36,7 @@ Button
   color: #f8f8f8;
   font-size: 1.1rem;
   outline: 0;
-  cursor: pointer;
+  cursor: pointer
 }
 
 .btn_sizeMin {
@@ -68,12 +68,13 @@ Button
   background: none;
   font: inherit;
   color: #444;
+  text-decoration: none;
 }
 
 .btn_asLink:hover {
   background-color: transparent;
-  border-color: #008183;
-  color: #008183;
+  border-color: #4CBB17;
+  color: #4CBB17;
 }
 
 /* --------------------------------------------------------------------------------
@@ -97,7 +98,7 @@ Form Treatment
 
 .formPanel {
   box-sizing: border-box;
-  width: 400px;
+  width: 300px;
   max-width: 100%;
   padding: 25px;
   margin: 0 auto 20px;

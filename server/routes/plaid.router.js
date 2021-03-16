@@ -26,7 +26,7 @@ router.post('/link_token', rejectUnauthenticated, async (req, res) => {
                 user: {
                     client_user_id: `${req.user.id}`
                 },
-                client_name: 'Expense Tracker',
+                client_name: 'Melt',
                 country_codes: ['US'],
                 language: 'en',
                 access_token: req.body.access_token
@@ -39,7 +39,7 @@ router.post('/link_token', rejectUnauthenticated, async (req, res) => {
                 user: {
                     client_user_id: `${req.user.id}`
                 },
-                client_name: 'Expense Tracker',
+                client_name: 'Melt',
                 products: ['transactions'],
                 country_codes: ['US'],
                 language: 'en'
@@ -114,8 +114,14 @@ router.get('/transactions', rejectUnauthenticated, async (req, res) => {
         console.log('Retrieved plaid transactions successfully');
         res.sendStatus(200);
     } catch (error) {
+        let errorStatus = 500;
+
+        if (error.error_code === 'ITEM_LOGIN_REQUIRED') {
+            errorStatus = 400
+        };
+
         console.log('Error in getting plaid transactions', error);
-        res.sendStatus(500);
+        res.sendStatus(errorStatus);
     };
 });
 

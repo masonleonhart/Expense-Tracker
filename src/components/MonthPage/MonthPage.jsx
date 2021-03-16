@@ -60,7 +60,6 @@ function MonthPage() {
 
     return (
         <div className='container'>
-            <br />
             <Paper style={{ maxWidth: 'fit-content', margin: 'auto' }}>
                 <br />
                 <Calendar
@@ -93,56 +92,61 @@ function MonthPage() {
             </Paper>
             <br />
             <br />
-            <MaterialTable
-                style={{ maxWidth: '80%', margin: 'auto' }}
-                title='Categories'
-                icons={tableIcons}
-                columns={[
-                    { title: 'Name', field: 'name' },
-                    {
-                        title: 'Category of Necessities', render: (rowData) => {
-                            return (
-                                <>
-                                    {rowData.necessity ? <p>Yes</p> : <p>No</p>}
-                                </>
-                            );
-                        }
-                    },
-                    { title: 'Amount Spent in Category', field: 'sum', type: 'currency' }
-                ]}
-                data={category.monthlyCategoryReducer}
-            />
-            <br />
-            <br />
-            <MaterialTable
-                style={{ maxWidth: '80%', margin: 'auto' }}
-                title='Transactions'
-                icons={tableIcons}
-                columns={[
-                    { title: 'Name', field: 'name' },
-                    {
-                        title: 'Date', render: (rowData) => {
-                            return (
-                                <>
-                                    {moment(rowData.date).format('MM-DD-YYYY')}
-                                </>
-                            );
-                        }
-                    },
-                    { title: 'Category', field: 'category_name' },
-                    {
-                        title: 'Amount', type: 'currency', render: (rowData) => {
-                            return (
-                                <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
-                                    {toCurrency.format(Number(rowData.amount) < 0 ?
-                                        (Number(rowData.amount) * -1) : Number(rowData.amount))}
-                                </p>
-                            );
-                        }
-                    },
-                ]}
-                data={expense.monthlyExpenseReducer}
-            />
+            <div id='month-tables-wrapper'>
+                <div id='month-categories-table'>
+                    <MaterialTable
+                        title='Categories'
+                        icons={tableIcons}
+                        columns={[
+                            { title: 'Name', field: 'name' },
+                            {
+                                title: 'Necessity', render: (rowData) => {
+                                    return (
+                                        <>
+                                            {rowData.necessity ? <p>Yes</p> : <p>No</p>}
+                                        </>
+                                    );
+                                }
+                            },
+                            { title: 'Total Spent', field: 'sum', type: 'currency' }
+                        ]}
+                        data={category.monthlyCategoryReducer}
+                    />
+                </div>
+                <br />
+                <br />
+                <div id='month-transactions-table'>
+                    <MaterialTable
+                        title='Transactions'
+                        icons={tableIcons}
+                        columns={[
+                            { title: 'Name', field: 'name' },
+                            {
+                                title: 'Date', render: (rowData) => {
+                                    return (
+                                        <>
+                                            {moment(rowData.date).format('MM-DD-YYYY')}
+                                        </>
+                                    );
+                                }
+                            },
+                            { title: 'Category', field: 'category_name' },
+                            {
+                                title: 'Amount', type: 'currency', render: (rowData) => {
+                                    return (
+                                        <p className={rowData.income ? 'income-amount' : 'expense-amount'}>
+                                            {toCurrency.format(Number(rowData.amount) < 0 ?
+                                                (Number(rowData.amount) * -1) : Number(rowData.amount))}
+                                        </p>
+                                    );
+                                }
+                            },
+                        ]}
+                        data={expense.monthlyExpenseReducer}
+                    />
+
+                </div>
+            </div>
         </div>
     );
 };

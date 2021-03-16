@@ -1,3 +1,4 @@
+import { ErrorOutlined } from '@material-ui/icons';
 import axios from 'axios';
 import { put, takeLatest } from 'redux-saga/effects';
 
@@ -20,9 +21,12 @@ function* fetchPlaidTransactionsSaga() {
     } catch (error) {
         // if there is an error in fetching plaid transactions, still refresh the uncategorized transaction list and
         // set the plaid error reducer to true
-        console.log('Error in fetching plaid transactions');
-        yield put({ type: 'FETCH_UNCATEGORIZED' });
-        yield put({ type: 'SET_PLAID_ERROR_TRUE' });
+        console.log('Error in fetching plaid transactions', error);
+
+        if (error.response.status === 400) {
+            yield put({ type: 'SET_PLAID_ERROR_TRUE' });
+            yield put({ type: 'FETCH_UNCATEGORIZED' });
+        };
     };
 };
 

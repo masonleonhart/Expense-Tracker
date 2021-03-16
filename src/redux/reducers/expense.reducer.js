@@ -129,7 +129,7 @@ const newExpenseReducer = (state = { income: false, category_id: '', name: '', a
             newState.date = action.payload;
             return newState;
         case 'RESET_NEW_EXPENSE_REDUCER':
-            return state = { income: false, category_id: 0, name: '', amount: '', date: moment().format('YYYY-MM-DD') };
+            return state = { income: false, category_id: '', name: '', amount: '', date: moment().format('YYYY-MM-DD') };
         default:
             return state;
     };

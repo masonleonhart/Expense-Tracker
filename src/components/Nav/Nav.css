@@ -2,6 +2,10 @@ header a {
   text-decoration: none;
 }
 
+#menuError {
+  color: red;
+}
+
 .nav-title {
   font-size: 28px;
   font-weight: 700;
@@ -11,31 +15,12 @@ header a {
   text-decoration: none;
 }
 
-.navLink {
-  display: inline-block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 24px 10px;
-  text-decoration: none;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.drawerNavLink {
-  display: inline-block;
+.drawer-nav-title {
+  font-size: 28px;
+  font-weight: 700;
   color: black;
-  text-align: center;
-  padding: 24px 10px;
+  margin: auto;
   text-decoration: none;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-}
-
-header a p, header div p, .drawerNavLink p {
-  margin: 0;
-  padding-left: 5px;
 }
 
 @media (max-width: 330px) {

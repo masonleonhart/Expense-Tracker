@@ -1,0 +1,30 @@
+#day-table-wrapper {
+    display: flex;
+    width: 91%;
+    margin: auto;
+    justify-content: space-between;
+}
+
+#day-categories-table {
+    width: 45%;
+}
+
+#day-transactions-table {
+    width: 53%;
+}
+
+@media (max-width: 820px) {
+    #day-table-wrapper {
+        justify-content: space-around;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+
+    #day-categories-table {
+        width: 100%
+    }
+
+    #day-transactions-table {
+        width: 100%
+    }
+}

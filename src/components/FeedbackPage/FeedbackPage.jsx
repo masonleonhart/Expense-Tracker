@@ -244,7 +244,7 @@ function FeedbackPage() {
         <div className="tutorial-section">
           <img src={CalendarDay} style={{ width: "15rem" }} />
           <p>
-            The calendar on the Month section shows your daily net-income for
+            The Month section shows your daily net-income for
             each day on the calendar, a table of categories that you have
             transactions in for that month, and a list of all of your
             transactions for that month (expenses and incomes). The Daily
